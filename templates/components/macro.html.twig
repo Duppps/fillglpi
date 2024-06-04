@@ -1,0 +1,199 @@
+{% macro consumables(id, itemtype) %}
+    {% set allConsumables = call('GlpiPlugin\\Cotrisoja\\ConsumableExt::getConsumablesAndItemTypes', ['GlpiPlugin\\Cotrisoja\\Limpeza']) %}
+    {% set consumablesByItem = call(
+        'GlpiPlugin\\Cotrisoja\\ConsumableExt::getUsedConsumablesByItemType',
+        [
+            itemtype,
+            id
+        ]
+    ) %}
+
+    <label for="lista_tipo" class="form-label">Tipo:</label>
+    <select name="lista_tipo" id="lista_tipo" class="form-select"></select>
+
+    <div class="row">
+        <div class="col">
+            <label for="lista_insumos" class="form-label mt-2">Insumo:</label>
+            <select name="lista_insumos" id="lista_insumos" class="form-select"></select>  
+        </div>
+        <div class="col-4">
+            <label for="quantidade_insumos" class="form-label mt-2">Quantidade:</label>
+            <select name="quantidade_insumos" id="quantidade_insumos" class="form-select"></select> 
+        </div>
+    </div>   
+
+    <button class="mt-3 btn" type="button" id="btn_add_consumable">Adicionar insumo</button>
+
+    <div class="mt-3 border d-flex flex-wrap rounded" id="consumablesItems" style="min-height: 40px"></div>
+    <input id="consumables" name="consumables" readonly style="display: none"></input>
+
+    <script type="text/javascript"> 
+        var usedConsumable = Object.values({{ consumablesByItem|raw }});       
+        var dataConsumables = {{ allConsumables|raw }};
+        var activeConsumableType = [];
+        var listConsumables; 
+        var consumableInput = $('#consumables'); 
+        const inputQntd = $('#quantidade_insumos');               
+        
+        function addConsumableTypesOptions() {
+            $('#lista_tipo').empty();                                    
+
+            dataConsumables.forEach(function (data) {                        
+                var option = $('<option>', {
+                    value: data.id,
+                    text: data.name
+                });
+                $('#lista_tipo').append(option);                                                   
+            });
+            addConsumablesOptions(); 
+        }        
+
+        function addConsumablesOptions() {             
+            $('#lista_insumos').empty();
+            inputQntd.empty();                     
+
+            dataConsumables.forEach(function (data) {
+                if ((data.id == $("#lista_tipo").val()) && (data.consumables)) {
+                    data.consumables.forEach(function (consumable) {
+                        var option = $('<option>', {
+                            value: consumable.id,
+                            text: consumable.name
+                        });
+
+                        $('#lista_insumos').append(option); 
+                    });
+                }
+            });
+
+            activeConsumableType = getActiveConsumableType();
+            listConsumables = activeConsumableType.consumables;
+            alterStockConsumables(); 
+        } 
+
+        function alterStockConsumables() {
+            const consumable = listConsumables.find(function(item) {
+                return item.id == $("#lista_insumos").val();
+            });                     
+
+            if (consumable) {
+                var quantidade = 0;
+
+                consumable.amount.forEach(function(item) {
+                    if (item.date_out == null) {
+                        quantidade++;
+                    }
+                });
+
+                inputQntd.empty(); 
+            
+                if (quantidade == 0) {
+                    $("#btn_add_consumable").attr("disabled", true);
+                } else {
+                    $("#btn_add_consumable").attr("disabled", false);
+                    for (var i = 1; i <= quantidade; i++) {
+                        var optionQuantidade = $('<option>', {
+                            value: i,
+                            text: i
+                        });
+
+                        inputQntd.append(optionQuantidade);
+                    }    
+                }
+            } 
+        }
+        
+        $('#btn_add_consumable').click(function() {
+            var selectedItems = $('#lista_insumos').val();
+
+            let consumable = listConsumables.find(function(item) {
+                return item.id == $("#lista_insumos").val();
+            });           
+
+            for (var i = 0; i < $("#quantidade_insumos").val(); i++) {
+                for (var k = 0; k < consumable.amount.length; k++) {
+                    if ((consumable.amount[k].date_out == null)) {
+                        consumableInput.val(consumableInput.val() + consumable.amount[k].id + ";");
+                        $('#consumablesItems').append('<span class="selected-item border rounded-pill px-2 py-1 m-2" data-value="' + consumable.amount[k].id + '" style="cursor: pointer"><span class="selected-item-remove">' + $('#lista_insumos option[value="' + selectedItems + '"]').text() + '  <i class="fas fa-xmark"></i></span></span>');
+                        consumable.amount[k].date_out = new Date().toLocaleDateString();
+                        break;
+                    } 
+                }                               
+            }            
+
+            alterStockConsumables();
+        });
+
+        $(document).on('click', '.selected-item-remove', function() {
+            var valueToRemove = $(this).parent().attr('data-value');
+            var valueInput = $('#consumables').val();
+
+            var valuesSelected = valueInput.split(";");
+            var index = valuesSelected.indexOf(valueToRemove);
+
+            for (var i = 0; i < dataConsumables.length; i++) {
+                var itemtype = dataConsumables[i];
+                var consumable;
+
+                for (var j = 0; j < itemtype.consumables.length; j++) {
+                    var item = itemtype.consumables[j];                    
+                    for (var k = 0; k < item.amount.length; k++) {
+                        var consumableItem = item.amount[k];
+                        if (consumableItem.id == valueToRemove) {
+                            consumableItem.date_out = null;
+                            consumable = item;
+                            break; 
+                        }
+                    }                    
+                }
+
+                if (consumable) {
+                    break; 
+                }
+            }            
+
+            if (index !== -1) {
+                valuesSelected.splice(index, 1);
+            }
+
+            $('#consumables').val(valuesSelected.join(";"));
+
+            $('#lista_insumos option[value="' + valueToRemove + '"]').prop('selected', false);
+            $(this).parent().remove();         
+
+            alterStockConsumables();
+        });
+
+        $("#lista_tipo").on("change", function() {
+            addConsumablesOptions();            
+        });  
+
+        $("#lista_insumos").on("change", function() {
+            alterStockConsumables();
+        });  
+
+        function getActiveConsumableType() { 
+            const id = $("#lista_tipo").val();       
+            for (var i = 0; i < dataConsumables.length; i++) {
+                if (parseInt(dataConsumables[i].id) === parseInt(id)) {
+                    return dataConsumables[i];
+                }                 
+            }
+            return null; 
+        }  
+
+        $(document).ready(function () {                
+            addConsumableTypesOptions();            
+
+            usedConsumable.forEach(function(used) { 
+                used.consumables.forEach(function(cons) {
+                    cons.amount.forEach(function(item) {
+                        consumableInput.val(consumableInput.val() + item.id + ";");
+                        $('#consumablesItems').append('<span class="selected-item border rounded-pill px-2 py-1 m-2" data-value="' + item.id + '" style="cursor: pointer"><span class="selected-item-remove">' + cons.name + '  <i class="fas fa-xmark"></i></span></span>');
+                    });
+                });                 
+            });
+        });
+
+    </script>
+
+{% endmacro %}

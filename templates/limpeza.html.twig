@@ -1,0 +1,72 @@
+{% import "components/form/fields_macros.html.twig" as fields %}
+{% import "@cotrisoja/components/macro.html.twig" as macros %}
+
+<form name="asset_form" style="width: 100%;" class="d-flex flex-column" method="post" action="{{ subitem.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
+    <input type="hidden" name="itemtype" value="{{ item.getType() }}" />
+    <input type="hidden" name="items_id" value="{{ item.fields['id'] }}" />
+    <input type="hidden" name="_no_message_link" value="1" />
+    <div class='row'>
+        <div class="col">               
+            {{ fields.dropdownField(
+                'Computer',
+                'computers_id',
+                item.fields['computers_id'],
+                'Computador: ',
+                {
+                    'full_width': true,
+                    'icon_label': false,
+                    'rand': rand,
+                    'entity': item.fields['entities_id'],
+                    'disabled': disabled,
+                    'required': true
+                }
+            ) }}
+        </div>            
+        <div class="col">
+            {{ fields.dateField(
+                'date',
+                item.fields['date'],
+                'Data: ',
+                {
+                    'full_width': true,
+                    'required': true
+                }
+            ) }}
+        </div>
+    </div> 
+    <div class="row mt-3">      
+        <div class="col">
+            {{ macros.consumables(
+                item.fields['id'],
+                item.getType()
+            ) }}                                         
+        </div>              
+        <div class="col"> 
+            {{ fields.textareaField(
+                'observation',
+                item.fields['observation'],
+                'Observação: ',
+                {
+                    'full_width': true,
+                    'enable_richtext': true,
+                    'enable_mentions': true                        
+                }
+            ) }}
+        </div>        
+    </div>
+    <div class="mx-auto mt-3">        
+        {% if item.fields['id'] <= 0 %}
+            <button class="btn btn-primary me-2" type="submit" name="add">
+                <i class="fas fa-plus"></i>
+                <span>{{ _x('button', 'Add') }}</span>
+            </button>
+        {% else %}
+            <input type="hidden" name="id" value="{{ item.fields['id'] }}" />
+            <button class="btn btn-primary me-2" type="submit" name="update">
+                <i class="far fa-save"></i>
+                <span>{{ _x('button', 'Save') }}</span>
+            </button>
+        {% endif %}
+    </div>
+    <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}" />
+</form>

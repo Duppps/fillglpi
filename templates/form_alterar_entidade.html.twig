@@ -1,0 +1,80 @@
+{% extends 'components/itilobject/timeline/form_timeline_item.html.twig' %}
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{% set params = {'item': item}|merge(params|default({})) %}
+
+{% set candedit = item.maySolve() %}
+{% set noform = params['noform'] is defined or params['noform'] == true %}
+{% set disabled = (candedit == false) %}
+
+{% block timeline_card %}
+    {% if candedit %}
+        <form name="asset_form" style="width: 100%;" class="d-flex flex-column" method="post" action="{{ subitem.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>		          
+            <input type="hidden" name="itemtype" value="{{ item.getType() }}"/>
+            <input type="hidden" id="items_id" name="items_id" value="{{ item.fields['id'] }}"/>
+            <input type="hidden" name="_no_message_link" value="1"/>
+                
+            <div class="mb-2">
+                <label for="entity_" class="form-label">Entidade alvo: </label>
+                <select name="entity_" id="entity_" class="form-select"></select>
+            </div>
+            
+            {{ fields.textareaField(
+                'content',
+                content,
+                '',
+                {
+                    'full_width': true,
+                    'no_label': true,
+                    'enable_richtext': true,
+                    'enable_fileupload': true,
+                    'enable_mentions': true,
+                    'entities_id': item.fields['entities_id'],
+                    'rand': rand,
+                    'disabled': disabled,
+                }
+            )}}
+
+            {% if not noform %}
+                {{ call_plugin_hook('post_item_form', {"item": subitem, 'options': params}) }}
+                <div class="d-flex card-footer mx-n3 mb-n3">
+                    <button class="btn btn-primary me-2" type="submit" name="add" id="add_button">
+                        <i class="fas fa-plus"></i>
+                        <span>{{ _x('button', 'Add') }}</span>
+                    </button>
+                </div>
+
+                <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}"/>
+            {% endif %}
+        </form>
+
+        <script type="text/javascript">
+
+            $(document).ready(function () {                
+                ajaxGetEntities();
+            });            
+
+            function ajaxGetEntities() {
+                $.ajax({
+                    url: "{{ path('/plugins/cotrisoja/ajax/entidades.php') }}",
+                    method: 'GET',
+                    data: { entidades: {{ item.fields['id'] }} },
+                    dataType: 'json',
+                    success: function (response) {
+                        $('#entity_').empty();                
+                        response.forEach(function (data) {
+                            var option = $('<option>', {
+                                value: data.id,
+                                text: data.name
+                            });
+                            $('#entity_').append(option);                    
+                        });
+                    },
+                        error: function (xhr, status, error) {
+                        console.error('Erro na requisição:', error);
+                    }
+                });
+            }                       
+        </script>
+    {% endif %}
+{% endblock %}
