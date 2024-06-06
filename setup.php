@@ -3,18 +3,13 @@
 define('PLUGIN_COTRISOJA_VERSION', '1.0.0');
 define("PLUGIN_COTRISOJA_MIN_GLPI_VERSION", "10.0.0");
 define("PLUGIN_COTRISOJA_MAX_GLPI_VERSION", "10.0.99");
+define("PLUGIN_NAME", "cotrisoja");
 
-/**
- * Init hooks of the plugin.
- * REQUIRED
- *
- * @return void
- */
-function plugin_init_cotrisoja()
-{
+
+function plugin_init_cotrisoja () {
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['cotrisoja'] = true;
+    $PLUGIN_HOOKS['csrf_compliant'][PLUGIN_NAME] = true;
 
     $ITILInsumo = new GlpiPlugin\Cotrisoja\ITILinsumo();
     $canAddSolution = $ITILInsumo->canAddSolution();
@@ -22,7 +17,6 @@ function plugin_init_cotrisoja()
     $ITILAlterEntity = new GlpiPlugin\Cotrisoja\ITILAlterEntity();
     $canAlterEntity = $ITILAlterEntity->canAddSolution();
 
-    //TODO use plugin default dir for template, currently its using glpi root folder
     $insumoByChamado = [
         'insumo' => [
             'icon'          => $ITILInsumo::getIcon(),
@@ -46,10 +40,10 @@ function plugin_init_cotrisoja()
         ]
     ];
 
-    $PLUGIN_HOOKS['timeline_answer_actions']['cotrisoja'] = $insumoByChamado;
-    $PLUGIN_HOOKS['use_massive_action']['cotrisoja'] = 1;
-    $PLUGIN_HOOKS['menu_toadd']['cotrisoja'] = ['helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class];
-    $PLUGIN_HOOKS['item_purge']['cotrisoja'] = [
+    $PLUGIN_HOOKS['timeline_answer_actions'][PLUGIN_NAME] = $insumoByChamado;
+    $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
+    $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = ['helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class];
+    $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
         GlpiPlugin\Cotrisoja\Limpeza::class => 'cotrisoja_updateitem_called'
     ];
 
@@ -70,17 +64,9 @@ function plugin_init_cotrisoja()
     );
 }
 
-
-/**
- * Get the name and the version of the plugin
- * REQUIRED
- *
- * @return array
- */
-function plugin_version_cotrisoja()
-{
+function plugin_version_cotrisoja () {
     return [
-        'name'           => 'Cotrisoja',
+        'name'           => ucfirst(PLUGIN_NAME),
         'version'        => PLUGIN_COTRISOJA_VERSION,
         'author'         => 'Ruan',
         'license'        => '',
@@ -94,32 +80,18 @@ function plugin_version_cotrisoja()
     ];
 }
 
-/**
- * Check pre-requisites before install
- * OPTIONNAL, but recommanded
- *
- * @return boolean
- */
-function plugin_cotrisoja_check_prerequisites()
-{
+function plugin_cotrisoja_check_prerequisites () {
     return true;
 }
 
-/**
- * Check configuration process
- *
- * @param boolean $verbose Whether to display message on failure. Defaults to false
- *
- * @return boolean
- */
-function plugin_cotrisoja_check_config($verbose = false)
+function plugin_cotrisoja_check_config ($verbose = false)
 {
-    if (true) { // Your configuration check
+    if (true) { 
         return true;
     }
 
     if ($verbose) {
-        echo __('Installed / not configured', 'cotrisoja');
+        echo __('Installed / not configured', PLUGIN_NAME);
     }
     return false;
 }
