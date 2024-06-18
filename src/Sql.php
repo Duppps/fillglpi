@@ -81,5 +81,33 @@ class Sql {
         }
 
         return $response;
-    }    
+    }  
+    
+    public static function insert($table, $data) {
+        global $DB;                  
+
+        $columns = array_keys($data);
+        $values = array_values($data);
+
+        $columns_string = implode(',', $columns);
+        $rows_string = implode('","', $values);
+    
+        $DB->request('INSERT INTO ' . $table . ' (' . $columns_string . ') VALUES ("' . $rows_string . '")');
+    
+        return true;
+    }
+
+    public static function getValuesByID($ID, $table) {
+        global $DB;
+        
+        return $DB->request(['FROM' => $table, 'WHERE' => ['id' => $ID]]);        
+    }
+
+    public static function getAllValues($table) {
+        global $DB;
+
+        $response = $DB->request(['FROM' => $table]);                 
+        
+        return $response;        
+    }
 }

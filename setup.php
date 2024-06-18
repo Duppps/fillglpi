@@ -1,10 +1,9 @@
 <?php
 
-define('PLUGIN_COTRISOJA_VERSION', '1.0.0');
+define('PLUGIN_COTRISOJA_VERSION', '1.0.1');
 define("PLUGIN_COTRISOJA_MIN_GLPI_VERSION", "10.0.0");
 define("PLUGIN_COTRISOJA_MAX_GLPI_VERSION", "10.0.99");
 define("PLUGIN_NAME", "cotrisoja");
-
 
 function plugin_init_cotrisoja () {
     global $PLUGIN_HOOKS;
@@ -42,7 +41,11 @@ function plugin_init_cotrisoja () {
 
     $PLUGIN_HOOKS['timeline_answer_actions'][PLUGIN_NAME] = $insumoByChamado;
     $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
-    $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = ['helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class];
+    $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = [
+        'helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class,
+        'assets' => GlpiPlugin\Cotrisoja\Battery::class,
+        'tools' => GlpiPlugin\Cotrisoja\BatteryModel::class
+    ];
     $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
         GlpiPlugin\Cotrisoja\Limpeza::class => 'cotrisoja_updateitem_called'
     ];
@@ -62,6 +65,7 @@ function plugin_init_cotrisoja () {
             ]
         ]
     );
+    
 }
 
 function plugin_version_cotrisoja () {
