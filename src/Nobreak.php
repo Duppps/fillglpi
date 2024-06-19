@@ -24,8 +24,12 @@ class Nobreak extends CommonDBTM {
         return true;
     }
 
-    public function showForm($ID, array $options = []) {             
-        Form::showFormFor($this, $ID);
+    public function showForm($ID, array $options = []) {
+        $hideFields = [
+            'name'
+        ];             
+
+        Form::showFormFor($this, $ID, [], $hideFields);
   
         return true;
     }

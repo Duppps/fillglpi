@@ -64,7 +64,7 @@ class Form extends CommonDBTM {
         return $output;
     }
 
-    public static function showFormFor($itemType, $ID) {
+    public static function showFormFor($itemType, $ID, $otherFields = [], $hideFields = []) {
         global $DB;
         $table = $itemType->getTable();
         $findedValue = '';
@@ -93,53 +93,56 @@ class Form extends CommonDBTM {
             $label = ucwords(preg_replace('/_/', ' ', $label));
             $label = preg_replace('/Id/', '', $label);
 
-            if (strpos($row['Type'], 'varchar') !== false) {                 
-                $fields[] = [
-                    'type' => 'text',
-                    'name' => $row['Field'],
-                    'label' => $label,
-                    'value' => $findedValue
-                ];
-            } elseif (strpos($row['Type'], 'date') !== false) {
-                $fields[] = [
-                    'type' => 'date',
-                    'name' => $row['Field'],
-                    'label' => $label,
-                    'value' => $findedValue
-                ];   
-            } elseif (strpos($row['Type'], 'int') !== false) {
-                if ((strpos($row['Field'], '_id') !== false)) {                   
-                    $fieldItemType = getItemtypeForForeignKeyField($row['Field']);
+            if (!in_array($row['Field'], $hideFields)) {
+                if (strpos($row['Type'], 'varchar') !== false) {                 
+                    $fields[] = [
+                        'type' => 'text',
+                        'name' => $row['Field'],
+                        'label' => $label,
+                        'value' => $findedValue
+                    ];
+                } elseif (strpos($row['Type'], 'date') !== false) {
+                    $fields[] = [
+                        'type' => 'date',
+                        'name' => $row['Field'],
+                        'label' => $label,
+                        'value' => $findedValue
+                    ];   
+                } elseif (strpos($row['Type'], 'int') !== false) {
+                    if ((strpos($row['Field'], '_id') !== false)) {                   
+                        $fieldItemType = getItemtypeForForeignKeyField($row['Field']);
 
-                    $fields[] = [
-                        'type' => 'dropdown',
-                        'name' => $row['Field'],
-                        'label' => $label,
-                        'item' => $fieldItemType,
-                        'value' => $findedValue
-                    ];             
-                } else if ($row['Field'] != 'id') {
-                    $fields[] = [
-                        'type' => 'number',
-                        'name' => $row['Field'],
-                        'label' => $label,
-                        'value' => $findedValue
-                    ]; 
-                } else if ($row['Field'] == 'id' && $row['Extra'] != 'auto_increment') {                    
-                    $fields[] = [
-                        'type' => 'number',
-                        'name' => 'id',
-                        'label' => 'ID',
-                        'value' => $findedValue
-                    ]; 
-                }
-            } 
+                        $fields[] = [
+                            'type' => 'dropdown',
+                            'name' => $row['Field'],
+                            'label' => $label,
+                            'item' => $fieldItemType,
+                            'value' => $findedValue
+                        ];             
+                    } else if ($row['Field'] != 'id') {
+                        $fields[] = [
+                            'type' => 'number',
+                            'name' => $row['Field'],
+                            'label' => $label,
+                            'value' => $findedValue
+                        ]; 
+                    } else if ($row['Field'] == 'id' && $row['Extra'] != 'auto_increment') {                    
+                        $fields[] = [
+                            'type' => 'number',
+                            'name' => 'id',
+                            'label' => 'ID',
+                            'value' => $findedValue
+                        ]; 
+                    }                
+                } 
+            }
         }
 
         $loader = new TemplateRenderer();
         $loader->display('@cotrisoja/default_form.html.twig',
             [
-                'fields_table' => $fields
+                'fields_table' => $fields,
+                'other_fields' => $otherFields
             ]
         );
     }

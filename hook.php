@@ -66,7 +66,7 @@ function plugin_cotrisoja_install() {
 
     $migration->executeMigration();
 
-    //TODO inserir dentro de glpi_displaypreferences os valores predefinidos da pesquisa
+    //TODO inserir dentro de glpi_displaypreferences os valores predefinidos da pesquisa (?)
 
     return true;
 }

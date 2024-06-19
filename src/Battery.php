@@ -4,6 +4,7 @@ namespace GlpiPlugin\Cotrisoja;
 use GlpiPlugin\Cotrisoja\Form;
 use GlpiPlugin\Cotrisoja\NobreakModel;
 use CommonDBTM;
+use Dropdown;
 
 class Battery extends CommonDBTM {
     public static $rightname = 'plugin_cotrisoja_batteries';
@@ -24,8 +25,18 @@ class Battery extends CommonDBTM {
         return true;
     }
 
-    public function showForm($ID, array $options = []) {             
-        Form::showFormFor($this, $ID);
+    public function showForm($ID, array $options = []) { 
+        $otherFields[] = [
+            'type'  =>  'quantity',
+            'name'  =>  'quantity',
+            'label' =>  'Quantidade: '
+        ];
+
+        $hideFields = [
+            'name'
+        ];
+
+        Form::showFormFor($this, $ID, $otherFields, $hideFields);
   
         return true;
     }
