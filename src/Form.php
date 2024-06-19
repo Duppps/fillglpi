@@ -92,6 +92,8 @@ class Form extends CommonDBTM {
             $label = preg_replace('/plugin_cotrisoja_/', '', $row['Field']);
             $label = ucwords(preg_replace('/_/', ' ', $label));
             $label = preg_replace('/Id/', '', $label);
+            $label = rtrim($label, '\ \s');
+            $label = __($label, 'cotrisoja').': ';
 
             if (!in_array($row['Field'], $hideFields)) {
                 if (strpos($row['Type'], 'varchar') !== false) {                 

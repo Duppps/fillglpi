@@ -15,10 +15,11 @@ Session::checkLoginUser();
 
 
 if (isset($_POST['add'])) {
-   unset($_POST['id']);   
-
    $obj->check(-1, CREATE, $_POST);
-   $obj->add($_POST);
+
+   for ($i=0; $i<$_POST['quantity']; $i++) {
+      $obj->add($_POST);
+   }
 
    Html::back(); 
 
