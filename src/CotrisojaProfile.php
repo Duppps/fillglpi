@@ -6,6 +6,10 @@ use Html;
 use Session;
 use CommonGLPI;
 use GlpiPlugin\Cotrisoja\Limpeza;
+use GlpiPlugin\Cotrisoja\BatteryModel;
+use GlpiPlugin\Cotrisoja\NobreakModel;
+use GlpiPlugin\Cotrisoja\Nobreak;
+use GlpiPlugin\Cotrisoja\Battery;
 
 class CotrisojaProfile extends Profile {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
@@ -44,11 +48,34 @@ class CotrisojaProfile extends Profile {
         $title = __('Cotrisoja', 'cotrisoja');
 
         $profile->displayRightsChoiceMatrix(
-            [[
-                'itemtype' => Limpeza::class,
-                'label'    => Limpeza::getTypeName(),
-                'field'    => self::getProfileNameForItemtype(Limpeza::class)
-            ]],
+            [
+                [
+                    'itemtype' => Limpeza::class,
+                    'label'    => Limpeza::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(Limpeza::class)
+                ],
+                [
+                    'itemtype' => BatteryModel::class,
+                    'label'    => BatteryModel::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(BatteryModel::class)
+                ],
+                [
+                    'itemtype' => NobreakModel::class,
+                    'label'    => NobreakModel::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(NobreakModel::class)
+                ],
+                [
+                    'itemtype' => Nobreak::class,
+                    'label'    => Nobreak::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(Nobreak::class)
+                ],
+                [
+                    'itemtype' => Battery::class,
+                    'label'    => Battery::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(Battery::class)
+                ],
+
+            ],
             [
                 'canedit'       => $canedit,
                 'default_class' => 'tab_bg_2',

@@ -56,10 +56,10 @@ function plugin_cotrisoja_install() {
                     `expire_date` DATE NOT NULL,
                     `name` VARCHAR(50) DEFAULT NULL,
                     `plugin_cotrisoja_batterymodels_id` INT(11) UNSIGNED NOT NULL,         
-                    `plugin_cotrisoja_nobreaks_id` INT(11) UNSIGNED NOT NULL,                                  
+                    `plugin_cotrisoja_nobreaks_id` INT(11) UNSIGNED,                                  
                     PRIMARY KEY (`id`),
                     KEY `plugin_cotrisoja_batterymodels_id` (`plugin_cotrisoja_batterymodels_id`),
-                    KEY `plugin_cotrisoja_nobreaks_id` (`plugin_cotrisoja_nobreaks_id`)
+                    KEY `plugin_cotrisoja_nobreaks_id` (`plugin_cotrisoja_nobreaks_id`) 
                 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
         $DB->queryOrDie($query, $DB->error());
     }
@@ -105,107 +105,4 @@ function cotrisoja_updateitem_called(CommonDBTM $item) {
     if ($item::getType() == GlpiPlugin\Cotrisoja\Limpeza::class) {
         GlpiPlugin\Cotrisoja\Limpeza::itemPurge($item);
     }
-}
-
-function plugin_cotrisoja_getAddSearchOptionsNew($itemtype) {
-    $tab = [];       
-
-    switch ($itemtype) {
-        case GlpiPlugin\Cotrisoja\Limpeza::class:
-            $tab[] = [
-                'id'                 => '1',
-                'table'              => GlpiPlugin\Cotrisoja\Limpeza::getTable(),
-                'field'              => 'id',
-                'name'               => __('ID'),
-                'datatype'           => 'itemlink',
-                'massiveaction'      => false
-            ];
-        
-            $tab[] = [
-                'id'                 => '2',
-                'table'              => 'glpi_computers',
-                'field'              => 'name',
-                'name'               => __('Computador'),
-                'datatype'           => 'itemlink'
-            ];
-        
-            $tab[] = [
-                'id'                 => '3',
-                'table'              => 'glpi_users',
-                'field'              => 'name',
-                'joinparams'         => [  
-                    'beforejoin'  => [
-                        'table'      => 'glpi_computers',
-                        'field'      => 'users_id',
-                        'jointype'   => 'itemtype_item',
-                        'beforejoin' => [
-                            'table'      => GlpiPlugin\Cotrisoja\Limpeza::getTable(),
-                            'field'      => 'computers_id',
-                            'jointype'   => 'itemtype_item',
-                        ]
-                    ]            
-                ],
-                'name'               => __('Usuário'),
-                'datatype'           => 'itemlink'
-            ];    
-        
-            $tab[] = [
-                'id'                 => '4',
-                'table'              => GlpiPlugin\Cotrisoja\Limpeza::getTable(),
-                'field'              => 'date',
-                'name'               => __('Data'),
-                'datatype'           => 'date'
-            ];
-        
-            $tab[] = [
-                'id'                 => '5',
-                'table'              => GlpiPlugin\Cotrisoja\Limpeza::getTable(),
-                'field'              => 'observation',
-                'name'               => __('Observação'),
-                'datatype'           => 'varchar'
-            ];
-
-            break;
-        
-        case GlpiPlugin\Cotrisoja\Battery::class:
-            $battery = new GlpiPlugin\Cotrisoja\Battery;
-            $battery->searchOptionsNew();
-
-            break;
-        
-        case GlpiPlugin\Cotrisoja\BatteryModel::class:
-            $tab[] = [
-                'id'                 => '1',
-                'table'              => GlpiPlugin\Cotrisoja\BatteryModel::getTable(),
-                'field'              => 'name',
-                'name'               => __('Name'),
-                'datatype'           => 'itemlink',
-                'massiveaction'      => false
-            ];   
-            
-            $tab[] = [
-                'id'                 => '2',
-                'table'              => GlpiPlugin\Cotrisoja\BatteryModel::getTable(),
-                'field'              => 'brand',
-                'name'               => __('Marca'),
-                'datatype'           => 'itemlink',
-                'massiveaction'      => true
-            ];   
-
-            break;
-        
-        case GlpiPlugin\Cotrisoja\NobreakModel::class:
-            $nobreakModel = new GlpiPlugin\Cotrisoja\NobreakModel();
-            $nobreakModel->searchOptionsNew();
-
-            break;
-        
-        case GlpiPlugin\Cotrisoja\Nobreak::class:
-            $nobreak = new GlpiPlugin\Cotrisoja\Nobreak();
-            $nobreak->searchOptionsNew();
-    
-            break;
-    }     
- 
-    return $tab;
 }

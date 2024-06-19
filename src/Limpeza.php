@@ -5,7 +5,6 @@ use CommonDBTM;
 use CommonGLPI;
 use Computer;
 use Consumable;
-use Session;
 use Glpi\Application\View\TemplateRenderer;
 
 class Limpeza extends CommonDBTM {
@@ -73,5 +72,62 @@ class Limpeza extends CommonDBTM {
       foreach ($consumables as $consumable) {
          $obj->backToStock(['id' => $consumable['id']]);
       }
+   }
+
+   public function rawSearchOptions() {
+      $tab[] = [
+         'id'                 => '1',
+         'table'              => $this::getTable(),
+         'field'              => 'id',
+         'name'               => __('ID'),
+         'datatype'           => 'itemlink',
+         'massiveaction'      => false
+      ];
+ 
+      $tab[] = [
+         'id'                 => '2',
+         'table'              => 'glpi_computers',
+         'field'              => 'name',
+         'name'               => __('Computador'),
+         'datatype'           => 'itemlink'
+      ];
+ 
+      $tab[] = [
+         'id'                 => '3',
+         'table'              => 'glpi_users',
+         'field'              => 'name',
+         'joinparams'         => [  
+            'beforejoin'  => [
+               'table'      => 'glpi_computers',
+               'field'      => 'users_id',
+               'jointype'   => 'itemtype_item',
+               'beforejoin' => [
+                  'table'      => $this::getTable(),
+                  'field'      => 'computers_id',
+                  'jointype'   => 'itemtype_item',
+               ]
+            ]            
+         ],
+         'name'               => __('Usuário'),
+         'datatype'           => 'itemlink'
+      ];    
+ 
+      $tab[] = [
+         'id'                 => '4',
+         'table'              => $this::getTable(),
+         'field'              => 'date',
+         'name'               => __('Date'),
+         'datatype'           => 'date'
+      ];
+ 
+     $tab[] = [
+         'id'                 => '5',
+         'table'              => $this::getTable(),
+         'field'              => 'observation',
+         'name'               => __('Observação'),
+         'datatype'           => 'varchar'
+     ];
+
+      return $tab;
    }
 }

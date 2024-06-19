@@ -26,8 +26,6 @@ if (isset($_POST['add'])) {
 
    Html::back();
 } else if (isset($_POST["update"])) {
-   echo "update";
-
    $obj->check($_POST['id'], UPDATE, $_POST);
    $obj->update($_POST);
    

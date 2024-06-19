@@ -2,10 +2,8 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Sql;
-use GlpiPlugin\Cotrisoja\NobreakModel;
 use CommonDBTM;
 use Glpi\Application\View\TemplateRenderer;
-use Session;
 
 class Form extends CommonDBTM {
     public static function inputText($name, $label, $value = '') {
@@ -143,6 +141,7 @@ class Form extends CommonDBTM {
         $loader = new TemplateRenderer();
         $loader->display('@cotrisoja/default_form.html.twig',
             [
+                'id'         => $ID,
                 'fields_table' => $fields,
                 'other_fields' => $otherFields
             ]

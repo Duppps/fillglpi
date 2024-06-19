@@ -4,6 +4,7 @@ namespace GlpiPlugin\Cotrisoja;
 use GlpiPlugin\Cotrisoja\Form;
 use GlpiPlugin\Cotrisoja\NobreakModel;
 use CommonDBTM;
+use Location;
 
 class Nobreak extends CommonDBTM {
     public static $rightname = 'plugin_cotrisoja_nobreaks';
@@ -14,15 +15,7 @@ class Nobreak extends CommonDBTM {
     
     public static function getIcon() {
         return 'fas fa-plug-circle-bolt';
-    }  
-
-    public static function canView() {
-        return true;
-    }
-
-    public static function canCreate() {
-        return true;
-    }
+    }      
 
     public function showForm($ID, array $options = []) {
         $hideFields = [
@@ -34,15 +27,47 @@ class Nobreak extends CommonDBTM {
         return true;
     }
 
-    public function searchOptionsNew() {       
+    public function rawSearchOptions() {       
         $tab[] = [
             'id'                 => '2',
             'table'              => $this::getTable(),
             'field'              => 'id',
             'name'               => __('Patrimônio'),
             'datatype'           => 'itemlink',
-            'massiveaction'      => false
+            'massiveaction'      => true
         ]; 
+
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => NobreakModel::getTable(),
+            'field'              => 'name',
+            'joinparams'         => [  
+                'beforejoin'  => [
+                    'table'      => $this::getTable(),
+                    'field'      => 'plugin_cotrisoja_nobreakmodels_id',
+                    'jointype'   => 'itemtype_item',                    
+                ]            
+            ],
+            'name'               => __('Modelo Nobreak'),
+            'datatype'           => 'itemlink',
+            'massiveaction'      => true
+        ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => Location::getTable(),
+            'field'              => 'name',
+            'joinparams'         => [  
+                'beforejoin'  => [
+                    'table'      => $this::getTable(),
+                    'field'      => 'locations_id',
+                    'jointype'   => 'itemtype_item',                    
+                ]            
+            ],
+            'name'               => __('Localização'),
+            'datatype'           => 'itemlink',
+            'massiveaction'      => true
+        ];
 
         return $tab;
     }

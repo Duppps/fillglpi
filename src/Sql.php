@@ -97,6 +97,12 @@ class Sql {
         return true;
     }
 
+    public static function update($parameters) {
+        global $DB;
+
+        $DB->request('UPDATE'.$parameters);
+    }
+
     public static function getValuesByID($ID, $table) {
         global $DB;
         

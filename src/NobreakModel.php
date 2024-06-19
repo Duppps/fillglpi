@@ -1,23 +1,17 @@
 <?php
 namespace GlpiPlugin\Cotrisoja;
 
+use GlpiPlugin\Cotrisoja\Form;
 use CommonDBTM;
 
 class NobreakModel extends CommonDBTM {
+    public static $rightname = 'plugin_cotrisoja_nobreakmodels';
     public static function getTypeName($nb = 0) {
         return _n('Modelo de Nobreak', 'Modelos de Nobreak', $nb);
     }
     
     public static function getIcon() {
         return 'fas fa-plug-circle-bolt';
-    }
-    
-    public static function canView() {
-        return true;
-    }
-
-    public static function canCreate() {
-        return true;
     }
 
     public function showForm($ID, array $options = []) {                    
@@ -26,14 +20,14 @@ class NobreakModel extends CommonDBTM {
         return true;
     }
 
-    public function searchOptionsNew() {
+    public function rawSearchOptions() {
         $tab[] = [
             'id'                 => '1',
             'table'              => $this::getTable(),
             'field'              => 'name',
             'name'               => __('Name'),
             'datatype'           => 'itemlink',
-            'massiveaction'      => false
+            'massiveaction'      => true
         ];   
         
         $tab[] = [
