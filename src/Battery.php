@@ -2,6 +2,7 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Form;
+use GlpiPlugin\Cotrisoja\NobreakModel;
 use CommonDBTM;
 
 class Battery extends CommonDBTM {
@@ -27,5 +28,46 @@ class Battery extends CommonDBTM {
         Form::showFormFor($this, $ID);
   
         return true;
-     }
+    }
+
+    public function searchOptionsNew() {
+        $tab[] = [
+            'id'                 => '1',
+            'table'              => $this::getTable(),
+            'field'              => 'id',
+            'name'               => __('ID'),
+            'datatype'           => 'itemlink',
+            'massiveaction'      => false
+        ];   
+        
+        $tab[] = [
+            'id'                 => '2',
+            'table'              => $this::getTable(),
+            'field'              => 'expire_date',
+            'name'               => __('Data de Vencimento'),
+            'datatype'           => 'date',
+            'massiveaction'      => true
+        ];   
+        
+        $tab[] = [
+            'id'                 => '3',
+            'table'              => NobreakModel::getTable(),
+            'field'              => 'name',
+            'joinparams'         => [  
+                'beforejoin'  => [
+                    'table'      => 'glpi_plugin_cotrisoja_nobreaks',
+                    'field'      => 'plugin_cotrisoja_nobreakmodels_id',
+                    'jointype'   => 'itemtype_item',
+                    'beforejoin' => [
+                        'table'      => $this::getTable(),
+                        'field'      => 'plugin_cotrisoja_nobreaks_property_code',
+                        'jointype'   => 'itemtype_item',
+                    ]
+                ]            
+            ],
+            'name'               => __('Modelo Nobreak'),
+            'datatype'           => 'itemlink'
+        ];
+        return $tab;
+    }
 }

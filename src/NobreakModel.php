@@ -9,7 +9,7 @@ class NobreakModel extends CommonDBTM {
     }
     
     public static function getIcon() {
-        return 'fas fa-car-battery';
+        return 'fas fa-plug-circle-bolt';
     }
     
     public static function canView() {

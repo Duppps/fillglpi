@@ -39,8 +39,8 @@ function plugin_cotrisoja_install() {
 
     if (!$DB->tableExists('glpi_plugin_cotrisoja_nobreaks')) {
         $query =  "CREATE TABLE `glpi_plugin_cotrisoja_nobreaks` (
-                    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                    `property_code` INT(50) NOT NULL,
+                    `id` INT(11) UNSIGNED NOT NULL,
+                    `name` VARCHAR(50) DEFAULT NULL,
                     `plugin_cotrisoja_nobreakmodels_id` INT(11) UNSIGNED NOT NULL,         
                     `locations_id` INT(11) UNSIGNED NOT NULL,              
                     PRIMARY KEY (`id`),
@@ -54,8 +54,9 @@ function plugin_cotrisoja_install() {
         $query =  "CREATE TABLE `glpi_plugin_cotrisoja_batteries` (
                     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `expire_date` DATE NOT NULL,
+                    `name` VARCHAR(50) DEFAULT NULL,
                     `plugin_cotrisoja_batterymodels_id` INT(11) UNSIGNED NOT NULL,         
-                    `plugin_cotrisoja_nobreaks_id` INT(11) UNSIGNED NOT NULL,              
+                    `plugin_cotrisoja_nobreaks_id` INT(11) UNSIGNED NOT NULL,                                  
                     PRIMARY KEY (`id`),
                     KEY `plugin_cotrisoja_batterymodels_id` (`plugin_cotrisoja_batterymodels_id`),
                     KEY `plugin_cotrisoja_nobreaks_id` (`plugin_cotrisoja_nobreaks_id`)
@@ -82,8 +83,8 @@ function plugin_cotrisoja_uninstall() {
       'limpezas',
       'batteries',
       'nobreaks',
-      'batteries_models',
-      'nobreaks_models'
+      'batterymodels',
+      'nobreakmodels'
     ];
 
     foreach ($tables as $table) {
@@ -167,43 +168,8 @@ function plugin_cotrisoja_getAddSearchOptionsNew($itemtype) {
             break;
         
         case GlpiPlugin\Cotrisoja\Battery::class:
-            $tab[] = [
-                'id'                 => '1',
-                'table'              => GlpiPlugin\Cotrisoja\Battery::getTable(),
-                'field'              => 'id',
-                'name'               => __('ID'),
-                'datatype'           => 'itemlink',
-                'massiveaction'      => false
-            ];   
-            
-            $tab[] = [
-                'id'                 => '2',
-                'table'              => GlpiPlugin\Cotrisoja\Battery::getTable(),
-                'field'              => 'expire_date',
-                'name'               => __('Data de Vencimento'),
-                'datatype'           => 'date',
-                'massiveaction'      => true
-            ];   
-            
-            $tab[] = [
-                'id'                 => '3',
-                'table'              => GlpiPlugin\Cotrisoja\NobreakModel::getTable(),
-                'field'              => 'name',
-                'joinparams'         => [  
-                    'beforejoin'  => [
-                        'table'      => 'glpi_plugin_cotrisoja_nobreaks',
-                        'field'      => 'plugin_cotrisoja_nobreakmodels_id',
-                        'jointype'   => 'itemtype_item',
-                        'beforejoin' => [
-                            'table'      => GlpiPlugin\Cotrisoja\Battery::getTable(),
-                            'field'      => 'plugin_cotrisoja_nobreaks_id',
-                            'jointype'   => 'itemtype_item',
-                        ]
-                    ]            
-                ],
-                'name'               => __('Modelo Nobreak'),
-                'datatype'           => 'itemlink'
-            ];
+            $battery = new GlpiPlugin\Cotrisoja\Battery;
+            $battery->searchOptionsNew();
 
             break;
         

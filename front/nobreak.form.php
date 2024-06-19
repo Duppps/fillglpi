@@ -15,14 +15,10 @@ Session::checkLoginUser();
 
 
 if (isset($_POST['add'])) {
-   unset($_POST['id']);  
-   
-
    $obj->check(-1, CREATE, $_POST);
    $obj->add($_POST);
 
    Html::back();   
-
 } else if (isset($_POST["update"])) {
    echo "update";
 

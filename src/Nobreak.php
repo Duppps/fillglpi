@@ -2,6 +2,7 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Form;
+use GlpiPlugin\Cotrisoja\NobreakModel;
 use CommonDBTM;
 
 class Nobreak extends CommonDBTM {
@@ -12,7 +13,7 @@ class Nobreak extends CommonDBTM {
     }
     
     public static function getIcon() {
-        return 'fas fa-car-battery';
+        return 'fas fa-plug-circle-bolt';
     }  
 
     public static function canView() {
@@ -29,20 +30,11 @@ class Nobreak extends CommonDBTM {
         return true;
     }
 
-    public function searchOptionsNew() {
-        $tab[] = [
-            'id'                 => '1',
-            'table'              => $this::getTable(),
-            'field'              => 'id',
-            'name'               => __('ID'),
-            'datatype'           => 'itemlink',
-            'massiveaction'      => false
-        ];
-
+    public function searchOptionsNew() {       
         $tab[] = [
             'id'                 => '2',
             'table'              => $this::getTable(),
-            'field'              => 'property_code',
+            'field'              => 'id',
             'name'               => __('Patrimônio'),
             'datatype'           => 'itemlink',
             'massiveaction'      => false
