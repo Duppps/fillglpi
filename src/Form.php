@@ -27,6 +27,17 @@ class Form extends CommonDBTM {
         return $output;
     }
 
+    public static function wrapInDiv($item, $class = []) {
+        $classes = implode(' ', $class);
+        $output = '
+            <div class="'.$classes.'">
+                '.$item.'
+            </div>  
+        ';
+
+        return $output;
+    }
+
     public static function dropdownForTable($name, $label, $field, $value) {
         $table = 'glpi_'.explode('_id', $field)[0];
 
@@ -80,25 +91,26 @@ class Form extends CommonDBTM {
                 }
             }
 
-            $label = preg_replace('/_/', ' ', $row['Field']);
+            $label = preg_replace('/plugin_cotrisoja_/', '', $row['Field']);
+            $label = ucwords(preg_replace('/_/', ' ', $label));
+            $label = preg_replace('/Id/', '', $label);
 
             if (strpos($row['Type'], 'varchar') !== false) { 
-                $output .= self::inputText($row['Field'], $label, $findedValue);                
+                $output .= self::wrapInDiv(self::inputText($row['Field'], $label, $findedValue));               
             } elseif (strpos($row['Type'], 'date') !== false) {
-                $output .= self::inputDate($row['Field'], $label, $findedValue);
+                $output .= self::wrapInDiv(self::inputDate($row['Field'], $label, $findedValue), ["mt-2"]);     
             } elseif (strpos($row['Type'], 'int') !== false) {
-                if (strpos($row['Field'], '_id') !== false) {                     
-                    $output .= self::dropdownForTable($row['Field'], $label, $row['Field'], $findedValue);
+                if (strpos($row['Field'], '_id') !== false) {               
+                    $output .= self::wrapInDiv(self::dropdownForTable($row['Field'], $label, $row['Field'], $findedValue), ['mt-2']);      
                 } else if ($row['Field'] != 'id') {
-                    $output .= self::inputInt($row['Field'], $label, $findedValue);
+                    $output .= self::wrapInDiv(self::inputInt($row['Field'], $label, $findedValue), ["mt-2"]);
                 }
             } 
         }
 
         $output .= '<input type="hidden" name="_glpi_csrf_token" value="'.Session::getNewCSRFToken().'" />';
         $output .= '<input type="hidden" name="id" value="'.$ID.'" />';
-        $output .= '<button type="submit" name="'.$mode.'">Enviar</button>';
-
+        $output .= self::wrapInDiv('<button type="submit" name="'.$mode.'" class="btn btn-primary">Enviar</button>', ['mt-2']); 
         $output .= '</form>';
 
         echo $output;
