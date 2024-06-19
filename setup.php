@@ -43,8 +43,14 @@ function plugin_init_cotrisoja () {
     $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
     $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = [
         'helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class,
-        'assets' => GlpiPlugin\Cotrisoja\Battery::class,
-        'tools' => GlpiPlugin\Cotrisoja\BatteryModel::class
+        'assets' => [
+            GlpiPlugin\Cotrisoja\Battery::class,
+            \GlpiPlugin\Cotrisoja\Nobreak::class
+        ],
+        'tools' => [
+            GlpiPlugin\Cotrisoja\BatteryModel::class,
+            GlpiPlugin\Cotrisoja\NobreakModel::class
+        ]
     ];
     $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
         GlpiPlugin\Cotrisoja\Limpeza::class => 'cotrisoja_updateitem_called'

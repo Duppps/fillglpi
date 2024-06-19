@@ -187,21 +187,21 @@ function plugin_cotrisoja_getAddSearchOptionsNew($itemtype) {
             
             $tab[] = [
                 'id'                 => '3',
-                'table'              => 'glpi_plugin_cotrisoja_nobreakmodels',
+                'table'              => GlpiPlugin\Cotrisoja\NobreakModel::getTable(),
                 'field'              => 'name',
                 'joinparams'         => [  
                     'beforejoin'  => [
                         'table'      => 'glpi_plugin_cotrisoja_nobreaks',
-                        'field'      => 'id',
+                        'field'      => 'plugin_cotrisoja_nobreakmodels_id',
                         'jointype'   => 'itemtype_item',
                         'beforejoin' => [
                             'table'      => GlpiPlugin\Cotrisoja\Battery::getTable(),
-                            'field'      => 'nobreaks_id',
+                            'field'      => 'plugin_cotrisoja_nobreaks_id',
                             'jointype'   => 'itemtype_item',
                         ]
                     ]            
                 ],
-                'name'               => __('Nobreak'),
+                'name'               => __('Modelo Nobreak'),
                 'datatype'           => 'itemlink'
             ];
 
@@ -226,6 +226,18 @@ function plugin_cotrisoja_getAddSearchOptionsNew($itemtype) {
                 'massiveaction'      => true
             ];   
 
+            break;
+        
+        case GlpiPlugin\Cotrisoja\NobreakModel::class:
+            $nobreakModel = new GlpiPlugin\Cotrisoja\NobreakModel();
+            $nobreakModel->searchOptionsNew();
+
+            break;
+        
+        case GlpiPlugin\Cotrisoja\Nobreak::class:
+            $nobreak = new GlpiPlugin\Cotrisoja\Nobreak();
+            $nobreak->searchOptionsNew();
+    
             break;
     }     
  
