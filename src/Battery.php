@@ -2,12 +2,15 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Form;
+use GlpiPlugin\Cotrisoja\Nobreak;
 use GlpiPlugin\Cotrisoja\NobreakModel;
 use GlpiPlugin\Cotrisoja\BatteryModel;
 use CommonDBTM;
+use CommonGLPI;
 
 class Battery extends CommonDBTM {
     public static $rightname = 'plugin_cotrisoja_batteries';
+
     public static function getTypeName($nb = 0) {
         return _n('Bateria', 'Baterias', $nb);
     }
@@ -31,6 +34,11 @@ class Battery extends CommonDBTM {
   
         return true;
     }
+
+    public function getClass() {
+        return $this;
+    }
+
     public static function out($where) {
         Sql::update('glpi_plugin_cotrisoja SET plugin_cotrisoja_nobreaks_id NULL '.$where);
     }
@@ -120,5 +128,46 @@ class Battery extends CommonDBTM {
         ];
 
         return $tab;
+    }
+
+    function defineTabs($options=array()) {
+        $ong = array();
+        $this->addDefaultFormTab($ong);
+
+        return $ong;
+    }          
+     
+    function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
+        switch ($item::getType()) {
+            case Nobreak::getType():
+                return _n('Battery', 'Batteries', 2);
+        }
+        return '';
+    }
+     
+    static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {       
+        switch ($item::getType()) {
+            case Nobreak::getType():
+                $obj = new self();
+
+                $otherFields[] = [
+                    'type'  =>  'quantity',
+                    'name'  =>  'quantity',
+                    'label' =>  'Quantidade: '
+                ];
+
+                $otherFields[] = [
+                    'type'      =>  'text',
+                    'name'      =>  'plugin_cotrisoja_nobreaks_id',
+                    'label'     =>  '',
+                    'value'     =>  $item->getID(),
+                    'display'   =>  'none'
+                ];
+                
+                Form::showFormFor($obj->getClass(), -1, $otherFields, ['plugin_cotrisoja_nobreaks_id', 'name']);
+
+                break;
+        }
+        return true;
     }
 }

@@ -108,7 +108,7 @@ class Limpeza extends CommonDBTM {
                ]
             ]            
          ],
-         'name'               => __('Usuário'),
+         'name'               => __('User'),
          'datatype'           => 'itemlink'
       ];    
  
@@ -124,7 +124,7 @@ class Limpeza extends CommonDBTM {
          'id'                 => '5',
          'table'              => $this::getTable(),
          'field'              => 'observation',
-         'name'               => __('Observação'),
+         'name'               => __('Note'),
          'datatype'           => 'varchar'
      ];
 

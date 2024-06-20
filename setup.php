@@ -66,8 +66,15 @@ function plugin_init_cotrisoja () {
                 'Profile'
             ]
         ]
-    );
+    );   
     
+    Plugin::registerClass(
+        GlpiPlugin\Cotrisoja\Battery::class, [
+           'addtabon' => [
+                GlpiPlugin\Cotrisoja\Nobreak::class
+            ]
+        ]
+    );
 }
 
 function plugin_version_cotrisoja () {

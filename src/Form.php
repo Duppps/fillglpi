@@ -60,10 +60,10 @@ class Form extends CommonDBTM {
         $output .= '</select>';
 
         return $output;
-    }
+    }    
 
     public static function showFormFor($itemType, $ID, $otherFields = [], $hideFields = []) {
-        global $DB;
+        global $DB;        
         $table = $itemType->getTable();
         $findedValue = '';
 
@@ -91,7 +91,7 @@ class Form extends CommonDBTM {
             $label = ucwords(preg_replace('/_/', ' ', $label));
             $label = preg_replace('/Id/', '', $label);
             $label = rtrim($label, '\ \s');
-            $label = __($label, 'cotrisoja').': ';
+            $label = __($label).': ';            
 
             if (!in_array($row['Field'], $hideFields)) {
                 if (strpos($row['Type'], 'varchar') !== false) {                 
@@ -142,6 +142,7 @@ class Form extends CommonDBTM {
         $loader->display('@cotrisoja/default_form.html.twig',
             [
                 'id'         => $ID,
+                'itemtype'     => $itemType,
                 'fields_table' => $fields,
                 'other_fields' => $otherFields
             ]

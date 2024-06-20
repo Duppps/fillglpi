@@ -1,9 +1,9 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 {% import "@cotrisoja/components/macro.html.twig" as macros %}
 
-<form name="asset_form" style="width: 100%;" class="ms-3 d-flex flex-column" method="post" action="{{ subitem.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
-    <input type="hidden" name="itemtype" value="{{ item.getType() }}" />
-    <input type="hidden" name="items_id" value="{{ item.fields['id'] }}" />
+<form name="asset_form" style="width: 100%;" class="ms-3 d-flex flex-column" method="post" action="{{ itemtype.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
+    <input type="hidden" name="itemtype" value="{{ itemtype.getType() }}" />
+    <input type="hidden" name="items_id" value="{{ id }}" />
     <input type="hidden" name="_no_message_link" value="1" />   
 
     {% for field in fields_table %}          
@@ -30,6 +30,11 @@
                 '',
                 field.label
             ) }}
+        {% else %}
+            {% if item.display == none %}
+                {% set displayNone = 'display:none;' %}
+            {% endif %}
+            <input type="{{ field.type }}" name="{{ field.name }}" value="{{ field.value }}" style="{{ displayNone }}"/>
         {% endif %}
     {% endfor %}
 
