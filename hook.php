@@ -101,8 +101,14 @@ function plugin_cotrisoja_uninstall() {
     return true;
 }
 
-function cotrisoja_updateitem_called(CommonDBTM $item) {
+function plugin_cotrisoja_updateitem_called(CommonDBTM $item) {
     if ($item::getType() == GlpiPlugin\Cotrisoja\Limpeza::class) {
         GlpiPlugin\Cotrisoja\Limpeza::itemPurge($item);
     }
 }
+function plugin_cotrisoja_getDropdown() {
+    return [
+       GlpiPlugin\Cotrisoja\NobreakModel::class => _n('Modelo de Nobreak', 'Modelos de Nobreak', 2, 'cotrisoja'),
+       GlpiPlugin\Cotrisoja\BatteryModel::class => _n('Modelo de Bateria', 'Modelos de Baterias', 2, 'cotrisoja'),
+    ];
+ }

@@ -46,10 +46,6 @@ function plugin_init_cotrisoja () {
         'assets' => [
             GlpiPlugin\Cotrisoja\Battery::class,
             \GlpiPlugin\Cotrisoja\Nobreak::class
-        ],
-        'tools' => [
-            GlpiPlugin\Cotrisoja\BatteryModel::class,
-            GlpiPlugin\Cotrisoja\NobreakModel::class
         ]
     ];
     $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
