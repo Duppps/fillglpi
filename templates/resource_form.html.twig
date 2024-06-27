@@ -1,39 +1,16 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 {% import "@cotrisoja/components/macro.html.twig" as macros %}
 
-<form name="asset_form" class="ms-3 d-flex flex-column w-50" method="post" action="{{ itemtype.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
+<form name="asset_form" style="width: 100%;" class="ms-3 d-flex flex-column" method="post" action="{{ itemtype.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
     <input type="hidden" name="itemtype" value="{{ itemtype.getType() }}" />
     <input type="hidden" name="items_id" value="{{ id }}" />
     <input type="hidden" name="_no_message_link" value="1" />   
     
-    {% for field in fields_table %}          
-        {% if field.type == 'text' %}            
-            {{ macros.inputText(field.name, field.label, field.value) }}
-        {% elseif field.type == 'date' %}
-            {{ macros.inputDate(field.name, field.label, field.value) }}
-        {% elseif field.type == 'dropdown' %}
-            {{ fields.dropdownField(
-                field.item,
-                field.name,
-                field.value,
-                field.label                
-            ) }}
-        {% elseif field.type == 'number' %}
-            {{ macros.inputNumber(field.name, field.label, field.value) }}
-        {% endif %}
-    {% endfor %}
-
-    {% for field in other_fields %}
-        {% if field.type == "quantity" %}
-            {{ fields.dropdownNumberField(
-                field.name,
-                '1',
-                field.label
-            ) }}
-        {% else %}
-            {{ macros.genericInput(field.name, field.type, field.value, field.label, field.display) }}
-        {% endif %}
-    {% endfor %}
+    <div class="w-50">       
+        {{ macros.inputText('name', 'Nome', current_value.name) }}
+        <br>        
+        {{ macros.selectWithValues('reservationitems_id','Item', items_value, current_value) }}        
+    </div>
 
     <div class="mt-2">
         {% if id <= 0 %}

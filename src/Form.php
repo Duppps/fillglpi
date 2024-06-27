@@ -87,11 +87,7 @@ class Form extends CommonDBTM {
                 }
             }
 
-            $label = preg_replace('/plugin_cotrisoja_/', '', $row['Field']);
-            $label = ucwords(preg_replace('/_/', ' ', $label));
-            $label = preg_replace('/Id/', '', $label);
-            $label = rtrim($label, '\ \s');
-            $label = __($label).': ';            
+            $label = self::getLabelByField($row['Field']);
 
             if (!in_array($row['Field'], $hideFields)) {
                 if (strpos($row['Type'], 'varchar') !== false) {                 
@@ -145,6 +141,27 @@ class Form extends CommonDBTM {
                 'itemtype'     => $itemType,
                 'fields_table' => $fields,
                 'other_fields' => $otherFields
+            ]
+        );
+    }
+
+    public static function getLabelByField($field) {
+        $label = preg_replace('/plugin_cotrisoja_/', '', $field);
+        $label = ucwords(preg_replace('/_/', ' ', $label));
+        $label = preg_replace('/Id/', '', $label);
+        $label = rtrim($label, '\ \s');
+        $label = __($label).': ';   
+        
+        return $label;
+    }
+
+    public static function showSearch($data) {
+        $loader = new TemplateRenderer();
+        $loader->display('@cotrisoja/showTable_form.html.twig',
+            [
+                'columns'   =>  $data['header'],
+                'values'    =>  $data['values'],
+                'view'      =>  'true'
             ]
         );
     }

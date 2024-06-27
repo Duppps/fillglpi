@@ -103,10 +103,10 @@ class Sql {
         $DB->request('UPDATE'.$parameters);
     }
 
-    public static function getValuesByID($ID, $table) {
+    public static function getValuesByID($ID, $table, $field = 'id') {
         global $DB;
-        
-        return $DB->request(['FROM' => $table, 'WHERE' => ['id' => $ID]]);        
+
+        return $DB->request(['FROM' => $table, 'WHERE' => [$field => $ID]]);        
     }
 
     public static function getAllValues($table) {
@@ -115,5 +115,135 @@ class Sql {
         $response = $DB->request(['FROM' => $table]);                 
         
         return $response;        
+    }
+
+    public static function describe($table) {
+        global $DB;
+
+        return $DB->request('DESCRIBE '.$table);
+    }
+
+    public static function getSpecificField($field, $table, $qryValue, $qryField) {
+        global $DB;
+
+        $rest = $DB->request('SELECT '.$field.' FROM '.$table.' WHERE '.$qryField.' = '.$qryValue);
+
+        foreach ($rest as $r) {
+            $return = $r[$field];
+        }
+
+        return $return;
+    }
+
+    public static function getOpenReservationInfo($status) {
+        global $DB;
+        $response = [];
+
+        if ($status == 'open') {
+            $opr = '>';
+        } else if ($status == 'closed') {
+            $opr = '<';
+        }
+
+        $query = "
+            SELECT 
+                gr.id AS reservation_id,
+                gr.begin,
+                gr.end,
+                gu.name AS user_name,
+                gri.itemtype,
+                gri.items_id
+            FROM 
+                glpi_reservations gr
+            INNER JOIN 
+                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id
+            INNER JOIN 
+                glpi_users gu ON gr.users_id = gu.id
+            INNER JOIN 
+                glpi_reservationitems gri ON gr.reservationitems_id = gri.id
+            WHERE 
+                gr.begin ".$opr." CURRENT_DATE()
+            ORDER BY gr.begin           
+        ";
+
+        $result = $DB->request($query);
+
+        foreach ($result as $r) {
+            $itemTable = getTableForItemType($r['itemtype']);
+            $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
+            $itemName = $itemDetails->current()['name'];
+
+            $response[] = [
+                'id'        =>  $r['reservation_id'],
+                'item'      =>  $itemName,
+                'user'      =>  $r['user_name'],
+                'begin'     =>  DateFormatter::formatToBr($r['begin']),
+                'end'       =>  DateFormatter::formatToBr($r['end'])
+            ];            
+        }      
+        
+        return $response;
+    }
+
+    /**
+    * Return core informations about the reservation
+    *
+    * @param int $ID Reservation (glpi_reservation) ID
+
+    * @return array data from reservation
+    */ 
+    public static function getReservationInfo(int $ID) {
+        global $DB;
+        $response = [];
+        $resources = [];
+
+        $query = "
+            SELECT 
+                gr.id AS reservation_id,
+                gr.begin,
+                gr.end,
+                gr.comment,
+                gu.name AS user_name,
+                gri.itemtype,
+                gri.items_id,
+                gri.id AS reservationItemID,
+                gpc.people_quantity
+            FROM 
+                glpi_reservations gr
+            INNER JOIN 
+                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id
+            INNER JOIN 
+                glpi_plugin_cotrisoja_reservations_resources gprr ON gprr.id = gpc.id            
+            INNER JOIN 
+                glpi_users gu ON gr.users_id = gu.id
+            INNER JOIN 
+                glpi_reservationitems gri ON gr.reservationitems_id = gri.id
+            WHERE 
+                gr.id = ".$ID."
+        ";
+
+        $result = $DB->request($query);
+
+        foreach ($result as $r) {
+            $itemTable = getTableForItemType($r['itemtype']);
+            $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
+            $itemName = $itemDetails->current()['name'];
+
+            foreach (self::getValuesByID($r['reservationItemID'], 'glpi_plugin_cotrisoja_resources', 'reservationitems_id') as $b) {
+                array_push($resources, $b['name']);
+            }           
+
+            $response[] = [
+                'user'              =>  $r['user_name'],
+                'itemName'          =>  $itemName,
+                'begin'             =>  DateFormatter::formatToBr($r['begin']),
+                'end'               =>  DateFormatter::formatToBr($r['end']),
+                'comment'           =>  $r['comment'],
+                'peopleQuantity'    =>  $r['people_quantity'],
+                'recursos'          =>  $resources
+            ];                    
+        }      
+        
+        return $response;
     }
 }

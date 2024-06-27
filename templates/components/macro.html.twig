@@ -199,10 +199,8 @@
 {% endmacro %}
 
 {% macro inputText(name, label, value = '') %}
-    <div class="mt-2">
-        <label for="{{ name }}" class="form-label">{{ label }}</label>
-        <input type="text" name="{{ name }}" id="{{ name }}" value="{{ value }}"></input>
-    </div>
+    <label for="{{ name }}" class="form-label">{{ label }}</label>
+    <input type="text" name="{{ name }}" id="{{ name }}" value="{{ value }}" class="form-control"></input>
 {% endmacro %}
 
 {% macro inputDate(name, label, value = '') %}
@@ -213,8 +211,40 @@
 {% endmacro %}
 
 {% macro inputNumber(name, label, value = '') %}
-    <div class="mt-2">
-        <label for="{{ name }}" class="form-label">{{ label }}</label>
-        <input type="number" name="{{ name }}" id="{{ name }}" value="{{ value }}"></input>
+    <label for="{{ name }}" class="form-label">{{ label }}</label>
+    <input type="number" name="{{ name }}" id="{{ name }}" value="{{ value }}"></input>
+{% endmacro %}
+
+{% macro genericInput(name, type, value = '', label = '', display = 'true') %}
+    {% if type == "checkbox" %}
+        {% set classFormCheck = "form-check" %}
+    {% endif %}
+
+    <div class="{{ classFormCheck }}">
+        {% if display == "none" %}
+            {% set displayNone = 'display:none;' %}
+        {% else %}
+            {% set tagLabel %}
+                <label class="form-check-label" for="{{ name }}">{{label}}</label>
+            {% endset %}
+        {% endif %}
+        <input class="form-check-input" type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" style="{{ displayNone }}"/>
+        {{ tagLabel }}
     </div>
+{% endmacro %}
+
+{% macro selectWithValues(name, label, values, current_value = '') %}
+
+    <label for='{{ name }}' class='form-label'>{{ label }}</label>
+    <select name='{{ name }}' class="form-select">
+        <option value=''>---</option>
+        {% for b in values %}            
+            {% if b.id == current_value.reservationitems_id %}
+                <option selected value='{{ b.id }}'>{{ b.itemTypeName }}</option>
+            {% else %}
+                <option value='{{ b.id }}'>{{ b.itemTypeName }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
 {% endmacro %}

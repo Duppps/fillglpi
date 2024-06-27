@@ -31,7 +31,7 @@ class Nobreak extends CommonDBTM {
         $tab[] = [
             'id'                 => '2',
             'table'              => $this::getTable(),
-            'field'              => 'id',
+            'field'              => 'asset_number',
             'name'               => __('Patrimônio'),
             'datatype'           => 'itemlink',
             'massiveaction'      => true

@@ -1,0 +1,76 @@
+{% import "components/form/fields_macros.html.twig" as fields %}
+
+<tr id="tr_quantity">
+    <td>Quantidade de Pessoas</td>
+    <td>
+        {{ fields.dropdownNumberField(
+            'people_quantity',
+            '1',
+            ''
+        ) }}
+    </td>
+</tr>
+
+
+<script type="text/javascript">
+    function hasItemLikeParam(values) {
+        let params = new URLSearchParams(window.location.search);
+
+        for (let key of params.keys()) {
+            if (key.startsWith('item')) {
+                values.push(params.get(key)); 
+            }
+        }
+
+        return values.length > 0; 
+    }
+    
+    items = [];
+    
+    if (hasItemLikeParam(items)) {
+        items.forEach((item) => {
+            $.get("{{ path('/plugins/cotrisoja/ajax/resources.php') }}", {item: item}, function(response) {
+                if (response.resources.length > 0) {
+                    let tr = $('<tr>');
+                    let title = $('<td>').text('Recursos para ' + response.Item);
+                    let resources = $('<td>');
+                    let resourcesTable = $('<table>'); 
+
+                    response.resources.forEach((item) => {
+                        let form = `
+                            <tr>
+                                <td>
+                                    <input class="form-check-input" type="checkbox" id="resource_id_${item.id}" name="resource_id_${item.id}" value="${item.id}"/>
+                                </td>
+                                <td>
+                                    <label class="form-check-label" for="resource_id_${item.id}">${item.name}</label>
+                                </td>
+                            </tr>
+                        `;
+                        resourcesTable.append(form); 
+                    });
+
+                    resources.append(resourcesTable); 
+                    tr.append(title);
+                    tr.append(resources);
+
+                    let submitButton = $(".tab_cadre").find('tr').eq(-1);
+
+                    if (submitButton.length > 0) {
+                        submitButton.before(tr);
+                    } else {
+                        $(".tab_cadre").append(tr);
+                    }
+                }
+            }, 'json');
+        });
+    } else {
+        delete items;
+        let element = $("#tr_quantity");
+        element.hide();    
+
+        element.append().html(
+            `<input type='text' name='type_reserve' value='unique' style='display: none' />`
+        );
+    }
+</script>

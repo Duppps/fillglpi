@@ -2,9 +2,9 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Form;
-use CommonDBTM;
+use CommonDropdown;
 
-class BatteryModel extends CommonDBTM {
+class BatteryModel extends CommonDropdown {
     public static $rightname = 'plugin_cotrisoja_batterymodels';
     public static function getTypeName($nb = 0) {
         return _n('Modelo de Bateria', 'Modelos de Bateria', $nb);

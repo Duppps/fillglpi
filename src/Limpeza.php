@@ -6,6 +6,7 @@ use CommonGLPI;
 use Computer;
 use Consumable;
 use Glpi\Application\View\TemplateRenderer;
+use Reservation;
 
 class Limpeza extends CommonDBTM {
    public static $rightname = 'plugin_cotrisoja_limpezas';

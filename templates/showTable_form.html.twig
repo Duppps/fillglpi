@@ -1,0 +1,173 @@
+<div class="ms-3">
+    <label for="porLista" class="form-label">Mostrar reservas</label>
+    <div style="width: 20vw">
+        <select class="form-select" id="porLista">
+            <option value="open">Em aberto</option>
+            <option value="closed">Fechadas</option>
+        </select>
+    </div>
+</div>
+
+<table class="w-100 text-center mt-3 table table-striped">
+    <thead>
+        <tr>
+            {% if view == 'true' %}
+                <th>Ver</th>
+            {% endif %}        
+            {% for column in columns %}
+                <th>{{ column }}</th>
+            {% endfor %}            
+        </tr>
+    </thead>
+    <tbody id="reservations_table_body">               
+        {% for value in values %}
+            <tr>     
+                {% if view == 'true' %}
+                    <td>
+                        <button 
+                            type="button"
+                            class="btn btn-primary"
+                            value="{{value.id}}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#reservationModal"
+                            onclick="showFormModal(this)"
+                        ><i class="fas fa-eye"></i></button>
+                    </td>
+                {% endif %}
+                <td>{{ value.item }}</td>
+                <td>{{ value.user }}</td>
+                <td>{{ value.begin }}</td>
+                <td>{{ value.end }}</td>
+            </tr>
+        {% endfor %}        
+    </tbody>
+</table>
+
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Reserva</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#porLista").on("change", (e) => {
+        $.get(
+            "{{ path('/plugins/cotrisoja/ajax/reservations.php') }}",
+            {
+                byList: $("#porLista").val(),                
+            },
+            function(response) {
+                table = $("#reservations_table_body");
+                table.empty();
+
+                response.forEach((c) => {
+                    table.append(`
+                        <tr>                     
+                            <td>
+                                <button 
+                                    type="button"
+                                    class="btn btn-primary"
+                                    value="${c["id"]}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reservationModal"
+                                    onclick="showFormModal(this)"
+                                ><i class="fas fa-eye"></i></button>
+                            </td>               
+                            <td>${c["item"]}</td>
+                            <td>${c["user"]}</td>
+                            <td>${c["begin"]}</td>
+                            <td>${c["end"]}</td>
+                        </tr>                    
+                    `);
+                });
+            }
+        );
+    });
+
+    function showFormModal(e) {        
+        $.get(
+            "{{ path('/plugins/cotrisoja/ajax/reservations.php') }}",
+            {
+                id: e.value,                
+            },
+            function(response) {
+                let table = $('<table>').addClass('w-100');
+                
+                response.forEach((i) => {                    
+                    table.html(`
+                        <tr>
+                            <td>
+                                Usuário
+                            </td>
+                            <td>
+                                ${i.user}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Item
+                            </td>
+                            <td>
+                                ${i.itemName}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Início
+                            </td>
+                            <td>
+                                ${i.begin}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Fim
+                            </td>
+                            <td>
+                                ${i.end}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Quantidade de Pessoas
+                            </td>
+                            <td>
+                                ${i.peopleQuantity}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Comentário
+                            </td>
+                            <td>
+                                ${i.comment}
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>
+                                Recursos
+                            </td>
+                            <td>
+                                ${i.recursos}
+                            </td>
+                        </tr>                       
+                    `);
+                });
+
+                $("#modalBody").empty();
+                $("#modalBody").append(table);
+            }
+        );
+    }
+</script>

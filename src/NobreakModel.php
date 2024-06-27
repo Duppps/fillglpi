@@ -2,9 +2,9 @@
 namespace GlpiPlugin\Cotrisoja;
 
 use GlpiPlugin\Cotrisoja\Form;
-use CommonDBTM;
+use CommonDropdown;
 
-class NobreakModel extends CommonDBTM {
+class NobreakModel extends CommonDropdown {
     public static $rightname = 'plugin_cotrisoja_nobreakmodels';
     public static function getTypeName($nb = 0) {
         return _n('Modelo de Nobreak', 'Modelos de Nobreak', $nb);

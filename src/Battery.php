@@ -65,7 +65,8 @@ class Battery extends CommonDBTM {
                 ]            
             ],
             'name'               => __('Modelo'),
-            'datatype'           => 'itemlink'
+            'datatype'           => 'itemlink',
+            'massiveaction'      => true
         ]; 
 
         $tab[] = [
@@ -80,7 +81,8 @@ class Battery extends CommonDBTM {
                 ]            
             ],
             'name'               => __('Marca'),
-            'datatype'           => 'itemlink'
+            'datatype'           => 'itemlink',
+            'massiveaction'      => true
         ]; 
         
         $tab[] = [
@@ -89,7 +91,7 @@ class Battery extends CommonDBTM {
             'field'              => 'expire_date',
             'name'               => __('Data de Vencimento'),
             'datatype'           => 'date',
-            'massiveaction'      => true
+            'massiveaction'      => true            
         ]; 
         
         $tab[] = [
@@ -98,13 +100,14 @@ class Battery extends CommonDBTM {
             'field'              => 'id',
             'joinparams'         => [  
                 'beforejoin'  => [
-                    'table'      => $this::getTable(),
-                    'field'      => 'plugin_cotrisoja_nobreaks_id',
-                    'jointype'   => 'itemtype_item',                    
+                    'table'         => $this::getTable(),
+                    'field'         => 'plugin_cotrisoja_nobreaks_id',
+                    'jointype'      => 'itemtype_item', 
+                    'massiveaction' => true                   
                 ]            
             ],
             'name'               => __('Patrimônio Nobreak'),
-            'datatype'           => 'itemlink'
+            'datatype'           => 'itemlink'            
         ];
         
         $tab[] = [
@@ -124,7 +127,8 @@ class Battery extends CommonDBTM {
                 ]            
             ],
             'name'               => __('Modelo Nobreak'),
-            'datatype'           => 'itemlink'
+            'datatype'           => 'itemlink',
+            'massiveaction'      => false
         ];
 
         return $tab;
@@ -162,9 +166,38 @@ class Battery extends CommonDBTM {
                     'label'     =>  '',
                     'value'     =>  $item->getID(),
                     'display'   =>  'none'
-                ];
-                
-                Form::showFormFor($obj->getClass(), -1, $otherFields, ['plugin_cotrisoja_nobreaks_id', 'name']);
+                ];   
+
+                $p = [
+                    'start'      => 0,
+                    'is_deleted' => 0, 
+                    'criteria'   => [[
+                            'field'      => 5,        
+                            'searchtype' => 'equals',  
+                            'value'      => $item->getID(),         
+                        ],
+                    ]];
+
+                echo    '<ul class="nav nav-tabs" id="tabItem" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="create-tab" data-bs-toggle="tab" data-bs-target="#create-tab-pane" type="button" role="tab">';
+                echo                __('Add');
+                echo            '</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-tab-pane" type="button" role="tab">';
+                echo                __('List');
+                echo            '</button>
+                            </li>  
+                        </ul>
+                        <div class="tab-content" id="tbContent">
+                            <div class="tab-pane fade show active mb-2" id="create-tab-pane" role="tabpanel" aria-labelledby="create-tab" tabindex="0">';
+                                Form::showFormFor($obj->getClass(), -1, $otherFields, ['plugin_cotrisoja_nobreaks_id', 'name']);               
+                echo        '</div>
+                            <div class="tab-pane fade mb-2" id="list-tab-pane" role="tabpanel" tabindex="0">';
+                echo            \Search::showList(self::class, $p);
+                echo        '</div>
+                        </div>';                       
 
                 break;
         }

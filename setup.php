@@ -42,15 +42,29 @@ function plugin_init_cotrisoja () {
     $PLUGIN_HOOKS['timeline_answer_actions'][PLUGIN_NAME] = $insumoByChamado;
     $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
     $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = [
-        'helpdesk' => GlpiPlugin\Cotrisoja\Limpeza::class,
-        'assets' => [
+        'helpdesk'  => GlpiPlugin\Cotrisoja\Limpeza::class,
+        'assets'    => [
             GlpiPlugin\Cotrisoja\Battery::class,
-            \GlpiPlugin\Cotrisoja\Nobreak::class
-        ]
+            GlpiPlugin\Cotrisoja\Nobreak::class
+        ],
     ];
     $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
         GlpiPlugin\Cotrisoja\Limpeza::class => 'cotrisoja_updateitem_called'
     ];
+
+    $PLUGIN_HOOKS['item_add'][PLUGIN_NAME] = [
+        \Reservation::class =>  'cotrisoja_additem_called'
+    ];
+
+    $PLUGIN_HOOKS['post_item_form'][PLUGIN_NAME] = 'cotrisoja_params_hook';
+
+    Plugin::registerClass(
+        GlpiPlugin\Cotrisoja\Reservation::class, [
+           'addtabon' => [
+                \ReservationItem::class
+            ]
+        ]
+    );
 
     Plugin::registerClass(
         GlpiPlugin\Cotrisoja\Limpeza::class, [
@@ -74,7 +88,7 @@ function plugin_init_cotrisoja () {
                 GlpiPlugin\Cotrisoja\Nobreak::class
             ]
         ]
-    );
+    ); 
 }
 
 function plugin_version_cotrisoja () {

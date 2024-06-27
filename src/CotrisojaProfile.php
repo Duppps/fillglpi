@@ -74,6 +74,16 @@ class CotrisojaProfile extends Profile {
                     'label'    => Battery::getTypeName(),
                     'field'    => self::getProfileNameForItemtype(Battery::class)
                 ],
+                [
+                    'itemtype' => Resource::class,
+                    'label'    => Resource::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(Resource::class)
+                ],
+                [
+                    'itemtype' => Reservation::class,
+                    'label'    => Reservation::getTypeName(),
+                    'field'    => self::getProfileNameForItemtype(Reservation::class)
+                ]
 
             ],
             [

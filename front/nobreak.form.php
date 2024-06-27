@@ -16,23 +16,24 @@ Session::checkLoginUser();
 
 
 if (isset($_POST['add'])) {
+   $_POST['name'] = $_POST['asset_number'];
    $obj->check(-1, CREATE, $_POST);
    $obj->add($_POST);
 
-   Html::back();   
+   Html::redirect($obj->getLinkURL());
 } else if (isset($_POST["update"])) {
    $obj->check($_POST['id'], UPDATE, $_POST);
    $obj->update($_POST);
 
-   Html::back();
-} else if (isset($_POST["delete"])) {
+   Html::redirect($obj->getLinkURL());
+} else if (isset($_POST["delete"])) {   
    $where = ' plugin_cotrisoja_nobreaks_id = '.$_POST['id'];
-   Battery::out($where);
+   Battery::out($where);   
 
-   $obj->check($_POST['id'], DELETE, $_POST);
+   $obj->check($_POST['id'], PURGE, $_POST);
    $obj->delete($_POST);
 
-   Html::back();
+   $obj->redirectToList();
 } else {
    $withtemplate = (isset($_GET['withtemplate']) ? $_GET['withtemplate'] : "");
    $id = (isset($_GET['id']) ? $_GET['id'] : -1);
