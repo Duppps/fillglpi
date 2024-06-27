@@ -138,7 +138,6 @@ function plugin_cotrisoja_uninstall() {
 
     $filePath = GLPI_ROOT.'/src/Reservation.php';
     $fileRenamedOldPath = GLPI_ROOT.'/src/Reservation.bkp.php';
-    $fileNewPath = GLPI_ROOT.'/plugins/cotrisoja/files/ReservationWithHook.php';
     
     unlink($filePath);
     rename($fileRenamedOldPath, $filePath);   
