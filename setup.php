@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_COTRISOJA_VERSION', '1.0.1');
+define('PLUGIN_COTRISOJA_VERSION', '2.0.0');
 define("PLUGIN_COTRISOJA_MIN_GLPI_VERSION", "10.0.0");
 define("PLUGIN_COTRISOJA_MAX_GLPI_VERSION", "10.0.99");
 define("PLUGIN_NAME", "cotrisoja");
