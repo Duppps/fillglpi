@@ -211,9 +211,7 @@ class Sql {
             FROM 
                 glpi_reservations gr
             INNER JOIN 
-                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id
-            INNER JOIN 
-                glpi_plugin_cotrisoja_reservations_resources gprr ON gprr.id = gpc.id            
+                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id         
             INNER JOIN 
                 glpi_users gu ON gr.users_id = gu.id
             INNER JOIN 
@@ -229,9 +227,11 @@ class Sql {
             $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
             $itemName = $itemDetails->current()['name'];
 
-            foreach (self::getValuesByID($r['reservationItemID'], 'glpi_plugin_cotrisoja_resources', 'reservationitems_id') as $b) {
-                array_push($resources, $b['name']);
-            }           
+            foreach (self::getValuesByID($r['reservation_id'], 'glpi_plugin_cotrisoja_reservations_resources', 'plugin_cotrisoja_reservations_id') as $b) {
+                foreach (self::getValuesByID($b['plugin_cotrisoja_resources_id'], 'glpi_plugin_cotrisoja_resources') as $c) {
+                    array_push($resources, $c['name']);
+                }    
+            }                   
 
             $response[] = [
                 'user'              =>  $r['user_name'],
@@ -242,7 +242,7 @@ class Sql {
                 'peopleQuantity'    =>  $r['people_quantity'],
                 'recursos'          =>  $resources
             ];                    
-        }      
+        }    
         
         return $response;
     }
