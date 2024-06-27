@@ -1,19 +1,19 @@
 <?php
 
-define('PLUGIN_COTRISOJA_VERSION', '2.0.0');
-define("PLUGIN_COTRISOJA_MIN_GLPI_VERSION", "10.0.0");
-define("PLUGIN_COTRISOJA_MAX_GLPI_VERSION", "10.0.99");
-define("PLUGIN_NAME", "cotrisoja");
+define('PLUGIN_FILLGLPI_VERSION', '2.0.0');
+define("PLUGIN_FILLGLPI_MIN_GLPI_VERSION", "10.0.0");
+define("PLUGIN_FILLGLPI_MAX_GLPI_VERSION", "10.0.99");
+define("PLUGIN_NAME", "fillglpi");
 
-function plugin_init_cotrisoja () {
+function plugin_init_fillglpi () {
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS['csrf_compliant'][PLUGIN_NAME] = true;
 
-    $ITILInsumo = new GlpiPlugin\Cotrisoja\ITILinsumo();
+    $ITILInsumo = new GlpiPlugin\FillGlpi\ITILinsumo();
     $canAddSolution = $ITILInsumo->canAddSolution();
 
-    $ITILAlterEntity = new GlpiPlugin\Cotrisoja\ITILAlterEntity();
+    $ITILAlterEntity = new GlpiPlugin\FillGlpi\ITILAlterEntity();
     $canAlterEntity = $ITILAlterEntity->canAddSolution();
 
     $insumoByChamado = [
@@ -23,7 +23,7 @@ function plugin_init_cotrisoja () {
             'class'         => 'ITILinsumo',
             'label'         => _x('button', 'Atribuir Insumo'),
             'short_label'   => _x('button', 'Insumo'),
-            'template'      => '@cotrisoja/form_insumo_chamado.html.twig',
+            'template'      => '@fillglpi/form_insumo_chamado.html.twig',
             'item'          => $ITILInsumo,
             'hide_in_menu'  => !$canAddSolution
         ],
@@ -33,7 +33,7 @@ function plugin_init_cotrisoja () {
             'class'         => 'ITILAlterEntity',
             'label'         => _x('button', 'Alterar Entidade'),
             'short_label'   => _x('button', 'Entidade'),
-            'template'      => '@cotrisoja/form_alterar_entidade.html.twig',
+            'template'      => '@fillglpi/form_alterar_entidade.html.twig',
             'item'          => $ITILAlterEntity,
             'hide_in_menu'  => !$canAlterEntity
         ]
@@ -42,24 +42,24 @@ function plugin_init_cotrisoja () {
     $PLUGIN_HOOKS['timeline_answer_actions'][PLUGIN_NAME] = $insumoByChamado;
     $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
     $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = [
-        'helpdesk'  => GlpiPlugin\Cotrisoja\Limpeza::class,
+        'helpdesk'  => GlpiPlugin\FillGlpi\Limpeza::class,
         'assets'    => [
-            GlpiPlugin\Cotrisoja\Battery::class,
-            GlpiPlugin\Cotrisoja\Nobreak::class
+            GlpiPlugin\FillGlpi\Battery::class,
+            GlpiPlugin\FillGlpi\Nobreak::class
         ],
     ];
     $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
-        GlpiPlugin\Cotrisoja\Limpeza::class => 'cotrisoja_updateitem_called'
+        GlpiPlugin\FillGlpi\Limpeza::class => 'fillglpi_updateitem_called'
     ];
 
     $PLUGIN_HOOKS['item_add'][PLUGIN_NAME] = [
-        \Reservation::class =>  'cotrisoja_additem_called'
+        \Reservation::class =>  'fillglpi_additem_called'
     ];
 
-    $PLUGIN_HOOKS['post_item_form'][PLUGIN_NAME] = 'cotrisoja_params_hook';
+    $PLUGIN_HOOKS['post_item_form'][PLUGIN_NAME] = 'fillglpi_params_hook';
 
     Plugin::registerClass(
-        GlpiPlugin\Cotrisoja\Reservation::class, [
+        GlpiPlugin\FillGlpi\Reservation::class, [
            'addtabon' => [
                 \ReservationItem::class
             ]
@@ -67,7 +67,7 @@ function plugin_init_cotrisoja () {
     );
 
     Plugin::registerClass(
-        GlpiPlugin\Cotrisoja\Limpeza::class, [
+        GlpiPlugin\FillGlpi\Limpeza::class, [
            'addtabon' => [
                 'Computer'
             ]
@@ -75,7 +75,7 @@ function plugin_init_cotrisoja () {
     );
 
     Plugin::registerClass(
-        GlpiPlugin\Cotrisoja\CotrisojaProfile::class, [
+        GlpiPlugin\FillGlpi\FillGlpiProfile::class, [
            'addtabon' => [
                 'Profile'
             ]
@@ -83,35 +83,35 @@ function plugin_init_cotrisoja () {
     );   
     
     Plugin::registerClass(
-        GlpiPlugin\Cotrisoja\Battery::class, [
+        GlpiPlugin\FillGlpi\Battery::class, [
            'addtabon' => [
-                GlpiPlugin\Cotrisoja\Nobreak::class
+                GlpiPlugin\FillGlpi\Nobreak::class
             ]
         ]
     ); 
 }
 
-function plugin_version_cotrisoja () {
+function plugin_version_fillglpi () {
     return [
         'name'           => ucfirst(PLUGIN_NAME),
-        'version'        => PLUGIN_COTRISOJA_VERSION,
+        'version'        => PLUGIN_FILLGLPI_VERSION,
         'author'         => 'Ruan',
         'license'        => '',
         'homepage'       => '',
         'requirements'   => [
             'glpi' => [
-                'min' => PLUGIN_COTRISOJA_MIN_GLPI_VERSION,
-                'max' => PLUGIN_COTRISOJA_MAX_GLPI_VERSION,
+                'min' => PLUGIN_FILLGLPI_MIN_GLPI_VERSION,
+                'max' => PLUGIN_FILLGLPI_MAX_GLPI_VERSION,
             ]
         ]
     ];
 }
 
-function plugin_cotrisoja_check_prerequisites () {
+function plugin_fillglpi_check_prerequisites () {
     return true;
 }
 
-function plugin_cotrisoja_check_config ($verbose = false)
+function plugin_fillglpi_check_config ($verbose = false)
 {
     if (true) { 
         return true;

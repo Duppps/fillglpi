@@ -1,5 +1,5 @@
 <?php
 include('../../../inc/includes.php');
 
-$dropdown = new GlpiPlugin\Cotrisoja\Resource();
+$dropdown = new GlpiPlugin\FillGlpi\Resource();
 include(GLPI_ROOT . "/front/dropdown.common.php");

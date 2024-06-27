@@ -1,21 +1,21 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 use Profile;
 use Html;
 use Session;
 use CommonGLPI;
-use GlpiPlugin\Cotrisoja\Limpeza;
-use GlpiPlugin\Cotrisoja\BatteryModel;
-use GlpiPlugin\Cotrisoja\NobreakModel;
-use GlpiPlugin\Cotrisoja\Nobreak;
-use GlpiPlugin\Cotrisoja\Battery;
+use GlpiPlugin\FillGlpi\Limpeza;
+use GlpiPlugin\FillGlpi\BatteryModel;
+use GlpiPlugin\FillGlpi\NobreakModel;
+use GlpiPlugin\FillGlpi\Nobreak;
+use GlpiPlugin\FillGlpi\Battery;
 
-class CotrisojaProfile extends Profile {
+class FillGlpiProfile extends Profile {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
         switch ($item->getType()) {
             case 'Profile':
-                return self::createTabEntry(__('Cotrisoja', 'cotrisoja'));            
+                return self::createTabEntry(__('FillGlpi', 'fillglpi'));            
         }
 
         return '';
@@ -45,7 +45,7 @@ class CotrisojaProfile extends Profile {
         echo "<table class='tab_cadre_fixe'>";
 
 
-        $title = __('Cotrisoja', 'cotrisoja');
+        $title = __('FillGlpi', 'fillglpi');
 
         $profile->displayRightsChoiceMatrix(
             [

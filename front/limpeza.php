@@ -4,12 +4,12 @@ include('../../../inc/includes.php');
 Session::checkRight('plugin_cotrisoja_limpezas', READ);
 
 Html::header(
-    GlpiPlugin\Cotrisoja\Limpeza::getTypeName(Session::getPluralNumber()),
+    GlpiPlugin\FillGlpi\Limpeza::getTypeName(Session::getPluralNumber()),
     $_SERVER['PHP_SELF'],
     'helpdesk',
-    GlpiPlugin\Cotrisoja\Limpeza::class    
+    GlpiPlugin\FillGlpi\Limpeza::class    
 );
 
-Search::show(GlpiPlugin\Cotrisoja\Limpeza::class);
+Search::show(GlpiPlugin\FillGlpi\Limpeza::class);
 
 Html::footer();

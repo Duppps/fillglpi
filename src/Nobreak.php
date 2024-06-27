@@ -1,13 +1,13 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
-use GlpiPlugin\Cotrisoja\Form;
-use GlpiPlugin\Cotrisoja\NobreakModel;
+use GlpiPlugin\FillGlpi\Form;
+use GlpiPlugin\FillGlpi\NobreakModel;
 use CommonDBTM;
 use Location;
 
 class Nobreak extends CommonDBTM {
-    public static $rightname = 'plugin_cotrisoja_nobreaks';
+    public static $rightname = 'plugin_fillglpi_nobreaks';
 
     public static function getTypeName($nb = 0) {
         return _n('Nobreak', 'Nobreaks', $nb);
@@ -44,7 +44,7 @@ class Nobreak extends CommonDBTM {
             'joinparams'         => [  
                 'beforejoin'  => [
                     'table'      => $this::getTable(),
-                    'field'      => 'plugin_cotrisoja_nobreakmodels_id',
+                    'field'      => 'plugin_fillglpi_nobreakmodels_id',
                     'jointype'   => 'itemtype_item',                    
                 ]            
             ],

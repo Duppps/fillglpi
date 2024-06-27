@@ -1,5 +1,5 @@
 <?php
-use GlpiPlugin\Cotrisoja\BD;
+use GlpiPlugin\FillGlpi\BD;
 use Glpi\Event;
 use Session;
 use ITILFollowup;

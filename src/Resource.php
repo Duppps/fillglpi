@@ -1,12 +1,12 @@
 <?php
 
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 use CommonDropdown;
 use Glpi\Application\View\TemplateRenderer;
 
 class Resource extends CommonDropdown {
-    public static $rightname = 'plugin_cotrisoja_resources';
+    public static $rightname = 'plugin_fillglpi_resources';
 
     public static function getTypeName($nb = 0) {
         return _n('Resource', 'Resources', $nb);
@@ -33,7 +33,7 @@ class Resource extends CommonDropdown {
             'joinparams'         => [  
                 'beforejoin'  => [
                     'table'      => $this::getTable(),
-                    'field'      => 'plugin_cotrisoja_reservationitems_id',
+                    'field'      => 'plugin_fillglpi_reservationitems_id',
                     'jointype'   => 'itemtype_item',                    
                 ]            
             ],
@@ -48,7 +48,7 @@ class Resource extends CommonDropdown {
     public function showForm($ID, array $options = []) {  
         $resource = [];
         $items = [];
-        $resourceResults = Sql::getValuesByID($ID, 'glpi_plugin_cotrisoja_resources');
+        $resourceResults = Sql::getValuesByID($ID, 'glpi_plugin_fillglpi_resources');
 
         foreach (Sql::getAllValues('glpi_reservationitems') as $item) {
             $table = getTableForItemType($item['itemtype']);
@@ -72,7 +72,7 @@ class Resource extends CommonDropdown {
         }        
 
         $loader = new TemplateRenderer();
-        $loader->display('@cotrisoja/resource_form.html.twig',
+        $loader->display('@fillglpi/resource_form.html.twig',
             [
                 'id'            =>  $ID,
                 'current_value' =>  $resource,
@@ -84,9 +84,9 @@ class Resource extends CommonDropdown {
     }
 
     public static function create($idResource, $idReservation) {
-        Sql::insert('glpi_plugin_cotrisoja_reservations_resources', [
-            'plugin_cotrisoja_resources_id'     =>  $idResource,
-            'plugin_cotrisoja_reservations_id'  =>  $idReservation
+        Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
+            'plugin_fillglpi_resources_id'     =>  $idResource,
+            'plugin_fillglpi_reservations_id'  =>  $idReservation
         ]);
     }
 

@@ -1,15 +1,15 @@
 <?php
 include('../../../inc/includes.php');
 
-Session::checkRight(GlpiPlugin\Cotrisoja\Reservation::$rightname, READ);
+Session::checkRight(GlpiPlugin\FillGlpi\Reservation::$rightname, READ);
 
 Html::header(
-    GlpiPlugin\Cotrisoja\Reservation::getTypeName(Session::getPluralNumber()),
+    GlpiPlugin\FillGlpi\Reservation::getTypeName(Session::getPluralNumber()),
     $_SERVER['PHP_SELF'],
     'tools',
     \Reservation::class    
 );
 
-Search::show(GlpiPlugin\Cotrisoja\Reservation::class);
+Search::show(GlpiPlugin\FillGlpi\Reservation::class);
 
 Html::footer();

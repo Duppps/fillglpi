@@ -1,5 +1,5 @@
 <?php
-use GlpiPlugin\Cotrisoja\Sql;
+use GlpiPlugin\FillGlpi\Sql;
 
 $AJAX_INCLUDE = 1;
 

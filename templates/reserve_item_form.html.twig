@@ -29,7 +29,7 @@
     
     if (hasItemLikeParam(items)) {
         items.forEach((item) => {
-            $.get("{{ path('/plugins/cotrisoja/ajax/resources.php') }}", {item: item}, function(response) {
+            $.get("{{ path('/plugins/fillglpi/ajax/resources.php') }}", {item: item}, function(response) {
                 if (response.resources.length > 0) {
                     let tr = $('<tr>');
                     let title = $('<td>').text('Recursos para ' + response.Item);

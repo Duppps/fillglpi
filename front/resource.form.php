@@ -1,13 +1,13 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\Resource;
+use GlpiPlugin\FillGlpi\Resource;
 
 include ("../../../inc/includes.php");
 
 $plugin = new Plugin();
 $obj = new Resource();
 
-if (!$plugin->isInstalled('cotrisoja') || !$plugin->isActivated('cotrisoja')) {
+if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
    Html::displayNotFoundError();
 }
 

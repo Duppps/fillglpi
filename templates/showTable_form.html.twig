@@ -63,7 +63,7 @@
 <script type="text/javascript">
     $("#porLista").on("change", (e) => {
         $.get(
-            "{{ path('/plugins/cotrisoja/ajax/reservations.php') }}",
+            "{{ path('/plugins/fillglpi/ajax/reservations.php') }}",
             {
                 byList: $("#porLista").val(),                
             },
@@ -97,7 +97,7 @@
 
     function showFormModal(e) {        
         $.get(
-            "{{ path('/plugins/cotrisoja/ajax/reservations.php') }}",
+            "{{ path('/plugins/fillglpi/ajax/reservations.php') }}",
             {
                 id: e.value,                
             },

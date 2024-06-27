@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 class DateFormatter {
     public static function formatToBr($date) {

@@ -1,7 +1,7 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
-use GlpiPlugin\Cotrisoja\Sql;
+use GlpiPlugin\FillGlpi\Sql;
 use CommonDBTM;
 use Glpi\Application\View\TemplateRenderer;
 
@@ -135,7 +135,7 @@ class Form extends CommonDBTM {
         }
 
         $loader = new TemplateRenderer();
-        $loader->display('@cotrisoja/default_form.html.twig',
+        $loader->display('@fillglpi/default_form.html.twig',
             [
                 'id'         => $ID,
                 'itemtype'     => $itemType,
@@ -146,7 +146,7 @@ class Form extends CommonDBTM {
     }
 
     public static function getLabelByField($field) {
-        $label = preg_replace('/plugin_cotrisoja_/', '', $field);
+        $label = preg_replace('/plugin_fillglpi_/', '', $field);
         $label = ucwords(preg_replace('/_/', ' ', $label));
         $label = preg_replace('/Id/', '', $label);
         $label = rtrim($label, '\ \s');
@@ -157,7 +157,7 @@ class Form extends CommonDBTM {
 
     public static function showSearch($data) {
         $loader = new TemplateRenderer();
-        $loader->display('@cotrisoja/showTable_form.html.twig',
+        $loader->display('@fillglpi/showTable_form.html.twig',
             [
                 'columns'   =>  $data['header'],
                 'values'    =>  $data['values'],

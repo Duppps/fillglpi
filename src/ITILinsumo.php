@@ -1,10 +1,7 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 use CommonDBChild;
-use TemplateRenderer;
-use Consumable;
-use CommonITILObject;
 use Session;
 
 class ITILInsumo extends CommonDBChild {

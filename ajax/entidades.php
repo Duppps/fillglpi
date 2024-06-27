@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\BD;
+use GlpiPlugin\FillGlpi\BD;
 
 $AJAX_INCLUDE = 1;
 

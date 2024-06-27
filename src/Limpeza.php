@@ -1,15 +1,14 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 use CommonDBTM;
 use CommonGLPI;
 use Computer;
 use Consumable;
 use Glpi\Application\View\TemplateRenderer;
-use Reservation;
 
 class Limpeza extends CommonDBTM {
-   public static $rightname = 'plugin_cotrisoja_limpezas';
+   public static $rightname = 'plugin_fillglpi_limpezas';
 
    public static function getTypeName($nb = 0) {
       return _n('Limpeza', 'Limpezas', $nb);
@@ -22,7 +21,7 @@ class Limpeza extends CommonDBTM {
    public function showForm($ID, array $options = []) {     
       $this->initForm($ID, $options);                    
       TemplateRenderer::getInstance()->display(
-         '@cotrisoja/limpeza.html.twig',
+         '@fillglpi/limpeza.html.twig',
          [
             'item'       => $this            
          ]
@@ -65,7 +64,7 @@ class Limpeza extends CommonDBTM {
       $consumables = $DB->request([
          'FROM'   => 'glpi_consumables',
          'WHERE'  => [
-            'itemtype'  => 'GlpiPlugin\\Cotrisoja\\Limpeza',
+            'itemtype'  => 'GlpiPlugin\\FillGlpi\\Limpeza',
             'items_id'  => $idItem
          ]
       ]);

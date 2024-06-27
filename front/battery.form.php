@@ -1,13 +1,13 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\Battery;
+use GlpiPlugin\FillGlpi\Battery;
 
 include ("../../../inc/includes.php");
 
 $plugin = new Plugin();
 $obj = new Battery();
 
-if (!$plugin->isInstalled('cotrisoja') || !$plugin->isActivated('cotrisoja')) {
+if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
    Html::displayNotFoundError();
 }
 

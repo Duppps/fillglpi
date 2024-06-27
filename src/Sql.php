@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 class Sql {
     public static function getConsumableItemTypes() {
@@ -156,7 +156,7 @@ class Sql {
             FROM 
                 glpi_reservations gr
             INNER JOIN 
-                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id
+                glpi_plugin_fillglpi_reservations gpc ON gr.id = gpc.reservations_id
             INNER JOIN 
                 glpi_users gu ON gr.users_id = gu.id
             INNER JOIN 
@@ -211,9 +211,9 @@ class Sql {
             FROM 
                 glpi_reservations gr
             INNER JOIN 
-                glpi_plugin_cotrisoja_reservations gpc ON gr.id = gpc.reservations_id
+                glpi_plugin_fillglpi_reservations gpc ON gr.id = gpc.reservations_id
             INNER JOIN 
-                glpi_plugin_cotrisoja_reservations_resources gprr ON gprr.id = gpc.id            
+                glpi_plugin_fillglpi_reservations_resources gprr ON gprr.id = gpc.id            
             INNER JOIN 
                 glpi_users gu ON gr.users_id = gu.id
             INNER JOIN 
@@ -229,7 +229,7 @@ class Sql {
             $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
             $itemName = $itemDetails->current()['name'];
 
-            foreach (self::getValuesByID($r['reservationItemID'], 'glpi_plugin_cotrisoja_resources', 'reservationitems_id') as $b) {
+            foreach (self::getValuesByID($r['reservationItemID'], 'glpi_plugin_fillglpi_resources', 'reservationitems_id') as $b) {
                 array_push($resources, $b['name']);
             }           
 

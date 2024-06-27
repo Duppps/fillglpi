@@ -1,12 +1,12 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\Limpeza;
-use GlpiPlugin\Cotrisoja\BD;
+use GlpiPlugin\FillGlpi\Limpeza;
+use GlpiPlugin\FillGlpi\BD;
 
 include ("../../../inc/includes.php");
 
 $plugin = new Plugin();
-if (!$plugin->isInstalled('cotrisoja') || !$plugin->isActivated('cotrisoja')) {
+if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
    Html::displayNotFoundError();
 }
 
@@ -51,7 +51,7 @@ if (isset($_POST['add'])) {
       }  
    }
 
-   Html::redirect("{$CFG_GLPI['root_doc']}/plugins/cotrisoja/front/limpeza.form.php?id=$newid");
+   Html::redirect("{$CFG_GLPI['root_doc']}/plugins/fillglpi/front/limpeza.form.php?id=$newid");
 } else if (isset($_POST["update"])) {
    if (isset($_POST['consumables'])) {
       if (Session::haveRight(Consumable::$rightname, UPDATE)) {
@@ -64,7 +64,7 @@ if (isset($_POST['add'])) {
          }     
 
          //pega todos os insumos em uso pela limpeza
-         $usedConsumables = BD::getItemConsumable('GlpiPlugin\\\Cotrisoja\\\Limpeza', $_POST['id']);      
+         $usedConsumables = BD::getItemConsumable('GlpiPlugin\\\FillGlpi\\\Limpeza', $_POST['id']);      
          
          foreach ($usedConsumables as $id) {
             $consumablesCurrent[] = $id['id'];          
@@ -84,7 +84,7 @@ if (isset($_POST['add'])) {
 
          if (count($toAdd) > 0) {
             foreach ($toAdd as $item) {
-               $consumable->out($item, 'GlpiPlugin\\Cotrisoja\\Limpeza', $_POST['id']);        
+               $consumable->out($item, 'GlpiPlugin\\FillGlpi\\Limpeza', $_POST['id']);        
             }
          }
       } else {

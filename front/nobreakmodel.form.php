@@ -1,13 +1,13 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\NobreakModel;
+use GlpiPlugin\FillGlpi\NobreakModel;
 
 include ("../../../inc/includes.php");
 
 $plugin = new Plugin();
 $obj = new NobreakModel();
 
-if (!$plugin->isInstalled('cotrisoja') || !$plugin->isActivated('cotrisoja')) {
+if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
    Html::displayNotFoundError();
 }
 

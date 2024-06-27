@@ -1,15 +1,15 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
-use GlpiPlugin\Cotrisoja\Form;
-use GlpiPlugin\Cotrisoja\Nobreak;
-use GlpiPlugin\Cotrisoja\NobreakModel;
-use GlpiPlugin\Cotrisoja\BatteryModel;
+use GlpiPlugin\FillGlpi\Form;
+use GlpiPlugin\FillGlpi\Nobreak;
+use GlpiPlugin\FillGlpi\NobreakModel;
+use GlpiPlugin\FillGlpi\BatteryModel;
 use CommonDBTM;
 use CommonGLPI;
 
 class Battery extends CommonDBTM {
-    public static $rightname = 'plugin_cotrisoja_batteries';
+    public static $rightname = 'plugin_fillglpi_batteries';
 
     public static function getTypeName($nb = 0) {
         return _n('Bateria', 'Baterias', $nb);
@@ -40,7 +40,7 @@ class Battery extends CommonDBTM {
     }
 
     public static function out($where) {
-        Sql::update('glpi_plugin_cotrisoja SET plugin_cotrisoja_nobreaks_id NULL '.$where);
+        Sql::update('glpi_plugin_fillglpi SET plugin_fillglpi_nobreaks_id NULL '.$where);
     }
 
     public function rawSearchOptions() {
@@ -60,7 +60,7 @@ class Battery extends CommonDBTM {
             'joinparams'         => [  
                 'beforejoin'  => [
                     'table'      => $this::getTable(),
-                    'field'      => 'plugin_cotrisoja_batterymodels_id',
+                    'field'      => 'plugin_fillglpi_batterymodels_id',
                     'jointype'   => 'itemtype_item',                    
                 ]            
             ],
@@ -76,7 +76,7 @@ class Battery extends CommonDBTM {
             'joinparams'         => [  
                 'beforejoin'  => [
                     'table'      => $this::getTable(),
-                    'field'      => 'plugin_cotrisoja_batterymodels_id',
+                    'field'      => 'plugin_fillglpi_batterymodels_id',
                     'jointype'   => 'itemtype_item',                    
                 ]            
             ],
@@ -101,7 +101,7 @@ class Battery extends CommonDBTM {
             'joinparams'         => [  
                 'beforejoin'  => [
                     'table'         => $this::getTable(),
-                    'field'         => 'plugin_cotrisoja_nobreaks_id',
+                    'field'         => 'plugin_fillglpi_nobreaks_id',
                     'jointype'      => 'itemtype_item', 
                     'massiveaction' => true                   
                 ]            
@@ -116,12 +116,12 @@ class Battery extends CommonDBTM {
             'field'              => 'name',
             'joinparams'         => [  
                 'beforejoin'  => [
-                    'table'      => 'glpi_plugin_cotrisoja_nobreaks',
-                    'field'      => 'plugin_cotrisoja_nobreakmodels_id',
+                    'table'      => 'glpi_plugin_fillglpi_nobreaks',
+                    'field'      => 'plugin_fillglpi_nobreakmodels_id',
                     'jointype'   => 'itemtype_item',
                     'beforejoin' => [
                         'table'      => $this::getTable(),
-                        'field'      => 'plugin_cotrisoja_nobreaks_property_code',
+                        'field'      => 'plugin_fillglpi_nobreaks_property_code',
                         'jointype'   => 'itemtype_item',
                     ]
                 ]            
@@ -162,7 +162,7 @@ class Battery extends CommonDBTM {
 
                 $otherFields[] = [
                     'type'      =>  'text',
-                    'name'      =>  'plugin_cotrisoja_nobreaks_id',
+                    'name'      =>  'plugin_fillglpi_nobreaks_id',
                     'label'     =>  '',
                     'value'     =>  $item->getID(),
                     'display'   =>  'none'
@@ -192,7 +192,7 @@ class Battery extends CommonDBTM {
                         </ul>
                         <div class="tab-content" id="tbContent">
                             <div class="tab-pane fade show active mb-2" id="create-tab-pane" role="tabpanel" aria-labelledby="create-tab" tabindex="0">';
-                                Form::showFormFor($obj->getClass(), -1, $otherFields, ['plugin_cotrisoja_nobreaks_id', 'name']);               
+                                Form::showFormFor($obj->getClass(), -1, $otherFields, ['plugin_fillglpi_nobreaks_id', 'name']);               
                 echo        '</div>
                             <div class="tab-pane fade mb-2" id="list-tab-pane" role="tabpanel" tabindex="0">';
                 echo            \Search::showList(self::class, $p);

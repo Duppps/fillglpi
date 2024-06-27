@@ -1,14 +1,14 @@
 <?php
 
-use GlpiPlugin\Cotrisoja\Reservation;
-use GlpiPlugin\Cotrisoja\Resource;
+use GlpiPlugin\FillGlpi\Reservation;
+use GlpiPlugin\FillGlpi\Resource;
 
 include ("../../../inc/includes.php");
 
 $plugin = new Plugin();
 $obj = new Reservation();
 
-if (!$plugin->isInstalled('cotrisoja') || !$plugin->isActivated('cotrisoja')) {
+if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
    Html::displayNotFoundError();
 }
 

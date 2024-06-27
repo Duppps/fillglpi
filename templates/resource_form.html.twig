@@ -1,5 +1,5 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
-{% import "@cotrisoja/components/macro.html.twig" as macros %}
+{% import "@fillglpi/components/macro.html.twig" as macros %}
 
 <form name="asset_form" style="width: 100%;" class="ms-3 d-flex flex-column" method="post" action="{{ itemtype.getFormURL() }}" enctype="multipart/form-data" data-track-changes="true" data-submit-once>  
     <input type="hidden" name="itemtype" value="{{ itemtype.getType() }}" />

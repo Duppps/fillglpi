@@ -1,14 +1,14 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
-use GlpiPlugin\Cotrisoja\DateFormatter;
+use GlpiPlugin\FillGlpi\DateFormatter;
 use CommonDBTM;
 use CommonGLPI;
 use Session;
 use Glpi\Application\View\TemplateRenderer;
 
 class Reservation extends CommonDBTM {
-    public static $rightname = 'plugin_cotrisoja_reservations';
+    public static $rightname = 'plugin_fillglpi_reservations';
     
     public static function getTypeName($nb = 0) {
         return _n('Reservation', 'Reservations', $nb);
@@ -124,7 +124,7 @@ class Reservation extends CommonDBTM {
         $reservationBegin = DateFormatter::formatToBr($reservation['begin']);
 
         //Pega os recursos dos itens da reserva
-        $resources = Sql::getValuesByID($reservation['reservationitems_id'], 'glpi_plugin_cotrisoja_resources', 'reservationitems_id');
+        $resources = Sql::getValuesByID($reservation['reservationitems_id'], 'glpi_plugin_fillglpi_resources', 'reservationitems_id');
 
         //Pega os itens da reserva
         $resourceReservation = Sql::getValuesByID($reservation['reservationitems_id'], 'glpi_reservationitems');
@@ -180,12 +180,12 @@ class Reservation extends CommonDBTM {
 
     public static function addFieldsInReservationForm() {
         $loader = new TemplateRenderer();
-        $loader->display('@cotrisoja/reserve_item_form.html.twig');
+        $loader->display('@fillglpi/reserve_item_form.html.twig');
     }
 
     public static function showViewTable() {
         $loader = new TemplateRenderer();
-        $loader->display('@cotrisoja/showTable_form.html.twig',
+        $loader->display('@fillglpi/showTable_form.html.twig',
             [
                 'view'      => 'true',
                 'columns'   =>  [
@@ -201,7 +201,7 @@ class Reservation extends CommonDBTM {
 
     function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
         if ($item::getType() == \ReservationItem::getType() && Session::haveRight(self::$rightname, CREATE)) {
-            return __('Visualizar Reservas', 'cotrisoja');
+            return __('Visualizar Reservas', 'fillglpi');
         }
     }
      

@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 class BD {
     public static function buscaTiposInsumos() {

@@ -1,5 +1,5 @@
 <?php
-namespace GlpiPlugin\Cotrisoja;
+namespace GlpiPlugin\FillGlpi;
 
 use CommonDBChild;
 use Session;

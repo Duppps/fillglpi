@@ -1,15 +1,15 @@
 <?php
 include('../../../inc/includes.php');
 
-Session::checkRight(GlpiPlugin\Cotrisoja\Battery::$rightname, READ);
+Session::checkRight(GlpiPlugin\FillGlpi\Battery::$rightname, READ);
 
 Html::header(
-    GlpiPlugin\Cotrisoja\Battery::getTypeName(Session::getPluralNumber()),
+    GlpiPlugin\FillGlpi\Battery::getTypeName(Session::getPluralNumber()),
     $_SERVER['PHP_SELF'],
     'assets',
-    GlpiPlugin\Cotrisoja\Battery::class    
+    GlpiPlugin\FillGlpi\Battery::class    
 );
 
-Search::show(GlpiPlugin\Cotrisoja\Battery::class);
+Search::show(GlpiPlugin\FillGlpi\Battery::class);
 
 Html::footer();

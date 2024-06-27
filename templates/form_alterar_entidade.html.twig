@@ -56,7 +56,7 @@
 
             function ajaxGetEntities() {
                 $.ajax({
-                    url: "{{ path('/plugins/cotrisoja/ajax/entidades.php') }}",
+                    url: "{{ path('/plugins/fillglpi/ajax/entidades.php') }}",
                     method: 'GET',
                     data: { entidades: {{ item.fields['id'] }} },
                     dataType: 'json',
