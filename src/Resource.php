@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 use CommonDropdown;
 use Glpi\Application\View\TemplateRenderer;

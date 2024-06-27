@@ -1,8 +1,8 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
-use GlpiPlugin\FillGlpi\Form;
-use GlpiPlugin\FillGlpi\NobreakModel;
+use GlpiPlugin\Fillglpi\Form;
+use GlpiPlugin\Fillglpi\NobreakModel;
 use CommonDBTM;
 use Location;
 

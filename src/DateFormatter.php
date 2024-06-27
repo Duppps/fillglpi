@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 class DateFormatter {
     public static function formatToBr($date) {

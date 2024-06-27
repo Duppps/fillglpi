@@ -168,14 +168,14 @@ function plugin_fillglpi_uninstall() {
 }
 
 function plugin_fillglpi_updateitem_called(CommonDBTM $item) {
-    if ($item::getType() == GlpiPlugin\FillGlpi\Limpeza::class) {
-        GlpiPlugin\FillGlpi\Limpeza::itemPurge($item);
+    if ($item::getType() == GlpiPlugin\Fillglpi\Limpeza::class) {
+        GlpiPlugin\Fillglpi\Limpeza::itemPurge($item);
     }
 }
 
 function fillglpi_additem_called(CommonDBTM $item) {
     if ($item::getType() == \Reservation::class) { 
-        $obj = new GlpiPlugin\FillGlpi\Reservation;
+        $obj = new GlpiPlugin\Fillglpi\Reservation;
 
         if (isset($_POST['type_reserve']) && $_POST['type_reserve'] == 'unique') {
             Html::redirect($obj->getFormURLWithID($item->getID()));
@@ -184,7 +184,7 @@ function fillglpi_additem_called(CommonDBTM $item) {
 
             foreach ($_POST as $i => $key) {
                 if (strpos($i, 'resource_id_') !== false) {
-                    GlpiPlugin\FillGlpi\Resource::create($key, $_POST['reservations_id']);
+                    GlpiPlugin\Fillglpi\Resource::create($key, $_POST['reservations_id']);
                 }
             }  
     
@@ -196,15 +196,15 @@ function fillglpi_additem_called(CommonDBTM $item) {
 
 function fillglpi_params_hook(array $params) {
     if (($params['item'] == new \Reservation())) {
-        GlpiPlugin\FillGlpi\Reservation::addFieldsInReservationForm();
+        GlpiPlugin\Fillglpi\Reservation::addFieldsInReservationForm();
     } 
 }
 
 
 function plugin_fillglpi_getDropdown() {
     return [
-        GlpiPlugin\FillGlpi\NobreakModel::class => _n('Modelo de Nobreak', 'Modelos de Nobreak', 2, 'fillglpi'),
-        GlpiPlugin\FillGlpi\BatteryModel::class => _n('Modelo de Bateria', 'Modelos de Baterias', 2, 'fillglpi'),
-        GlpiPlugin\FillGlpi\Resource::class     => _n('Recurso para Reserva', 'Recursos para Reserva', 2, 'fillglpi')
+        GlpiPlugin\Fillglpi\NobreakModel::class => _n('Modelo de Nobreak', 'Modelos de Nobreak', 2, 'fillglpi'),
+        GlpiPlugin\Fillglpi\BatteryModel::class => _n('Modelo de Bateria', 'Modelos de Baterias', 2, 'fillglpi'),
+        GlpiPlugin\Fillglpi\Resource::class     => _n('Recurso para Reserva', 'Recursos para Reserva', 2, 'fillglpi')
     ];
  }

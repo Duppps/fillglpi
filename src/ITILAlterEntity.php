@@ -1,5 +1,5 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 use CommonDBChild;
 use Session;

@@ -1,10 +1,10 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
-use GlpiPlugin\FillGlpi\Form;
-use GlpiPlugin\FillGlpi\Nobreak;
-use GlpiPlugin\FillGlpi\NobreakModel;
-use GlpiPlugin\FillGlpi\BatteryModel;
+use GlpiPlugin\Fillglpi\Form;
+use GlpiPlugin\Fillglpi\Nobreak;
+use GlpiPlugin\Fillglpi\NobreakModel;
+use GlpiPlugin\Fillglpi\BatteryModel;
 use CommonDBTM;
 use CommonGLPI;
 

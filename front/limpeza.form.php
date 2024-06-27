@@ -1,7 +1,7 @@
 <?php
 
-use GlpiPlugin\FillGlpi\Limpeza;
-use GlpiPlugin\FillGlpi\BD;
+use GlpiPlugin\Fillglpi\Limpeza;
+use GlpiPlugin\Fillglpi\BD;
 
 include ("../../../inc/includes.php");
 
@@ -64,7 +64,7 @@ if (isset($_POST['add'])) {
          }     
 
          //pega todos os insumos em uso pela limpeza
-         $usedConsumables = BD::getItemConsumable('GlpiPlugin\\\FillGlpi\\\Limpeza', $_POST['id']);      
+         $usedConsumables = BD::getItemConsumable('GlpiPlugin\\\Fillglpi\\\Limpeza', $_POST['id']);      
          
          foreach ($usedConsumables as $id) {
             $consumablesCurrent[] = $id['id'];          
@@ -84,7 +84,7 @@ if (isset($_POST['add'])) {
 
          if (count($toAdd) > 0) {
             foreach ($toAdd as $item) {
-               $consumable->out($item, 'GlpiPlugin\\FillGlpi\\Limpeza', $_POST['id']);        
+               $consumable->out($item, 'GlpiPlugin\\Fillglpi\\Limpeza', $_POST['id']);        
             }
          }
       } else {

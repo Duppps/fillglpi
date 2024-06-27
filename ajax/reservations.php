@@ -1,5 +1,5 @@
 <?php
-use GlpiPlugin\FillGlpi\Sql;
+use GlpiPlugin\Fillglpi\Sql;
 
 $AJAX_INCLUDE = 1;
 

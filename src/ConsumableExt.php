@@ -1,9 +1,9 @@
 <?php
 
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 use CommonDBTM;
-use GlpiPlugin\FillGlpi\Sql;
+use GlpiPlugin\Fillglpi\Sql;
 
 class ConsumableExt extends CommonDBTM {
     public static function getUsedConsumablesByItemType($itemtype, $itemID) {

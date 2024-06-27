@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\FillGlpi\Resource;
+use GlpiPlugin\Fillglpi\Resource;
 
 include ("../../../inc/includes.php");
 

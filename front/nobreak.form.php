@@ -1,7 +1,7 @@
 <?php
 
-use GlpiPlugin\FillGlpi\Nobreak;
-use GlpiPlugin\FillGlpi\Battery;
+use GlpiPlugin\Fillglpi\Nobreak;
+use GlpiPlugin\Fillglpi\Battery;
 
 include ("../../../inc/includes.php");
 

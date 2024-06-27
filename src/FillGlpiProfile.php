@@ -1,21 +1,21 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 use Profile;
 use Html;
 use Session;
 use CommonGLPI;
-use GlpiPlugin\FillGlpi\Limpeza;
-use GlpiPlugin\FillGlpi\BatteryModel;
-use GlpiPlugin\FillGlpi\NobreakModel;
-use GlpiPlugin\FillGlpi\Nobreak;
-use GlpiPlugin\FillGlpi\Battery;
+use GlpiPlugin\Fillglpi\Limpeza;
+use GlpiPlugin\Fillglpi\BatteryModel;
+use GlpiPlugin\Fillglpi\NobreakModel;
+use GlpiPlugin\Fillglpi\Nobreak;
+use GlpiPlugin\Fillglpi\Battery;
 
 class FillGlpiProfile extends Profile {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
         switch ($item->getType()) {
             case 'Profile':
-                return self::createTabEntry(__('FillGlpi', 'fillglpi'));            
+                return self::createTabEntry(__('Fillglpi', 'fillglpi'));            
         }
 
         return '';
@@ -45,7 +45,7 @@ class FillGlpiProfile extends Profile {
         echo "<table class='tab_cadre_fixe'>";
 
 
-        $title = __('FillGlpi', 'fillglpi');
+        $title = __('Fillglpi', 'fillglpi');
 
         $profile->displayRightsChoiceMatrix(
             [

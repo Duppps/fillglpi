@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\FillGlpi\BatteryModel;
+use GlpiPlugin\Fillglpi\BatteryModel;
 
 include ("../../../inc/includes.php");
 

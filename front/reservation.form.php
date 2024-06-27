@@ -1,7 +1,7 @@
 <?php
 
-use GlpiPlugin\FillGlpi\Reservation;
-use GlpiPlugin\FillGlpi\Resource;
+use GlpiPlugin\Fillglpi\Reservation;
+use GlpiPlugin\Fillglpi\Resource;
 
 include ("../../../inc/includes.php");
 

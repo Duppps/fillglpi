@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 class BD {
     public static function buscaTiposInsumos() {

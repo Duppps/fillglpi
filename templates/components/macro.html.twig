@@ -1,7 +1,7 @@
 {% macro consumables(id, itemtype) %}
-    {% set allConsumables = call('GlpiPlugin\\FillGlpi\\ConsumableExt::getConsumablesAndItemTypes', ['GlpiPlugin\\FillGlpi\\Limpeza']) %}
+    {% set allConsumables = call('GlpiPlugin\\Fillglpi\\ConsumableExt::getConsumablesAndItemTypes', ['GlpiPlugin\\Fillglpi\\Limpeza']) %}
     {% set consumablesByItem = call(
-        'GlpiPlugin\\FillGlpi\\ConsumableExt::getUsedConsumablesByItemType',
+        'GlpiPlugin\\Fillglpi\\ConsumableExt::getUsedConsumablesByItemType',
         [
             itemtype,
             id

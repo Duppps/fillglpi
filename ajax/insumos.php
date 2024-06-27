@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\FillGlpi\BD;
+use GlpiPlugin\Fillglpi\BD;
 use Consumable;
 
 $AJAX_INCLUDE = 1;

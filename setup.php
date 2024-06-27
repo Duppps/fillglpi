@@ -3,17 +3,17 @@
 define('PLUGIN_FILLGLPI_VERSION', '2.0.0');
 define("PLUGIN_FILLGLPI_MIN_GLPI_VERSION", "10.0.0");
 define("PLUGIN_FILLGLPI_MAX_GLPI_VERSION", "10.0.99");
-define("PLUGIN_NAME", "fillglpi");
+
 
 function plugin_init_fillglpi () {
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant'][PLUGIN_NAME] = true;
+    $PLUGIN_HOOKS['csrf_compliant']['fillglpi'] = true;
 
-    $ITILInsumo = new GlpiPlugin\FillGlpi\ITILinsumo();
+    $ITILInsumo = new GlpiPlugin\Fillglpi\ITILinsumo();
     $canAddSolution = $ITILInsumo->canAddSolution();
 
-    $ITILAlterEntity = new GlpiPlugin\FillGlpi\ITILAlterEntity();
+    $ITILAlterEntity = new GlpiPlugin\Fillglpi\ITILAlterEntity();
     $canAlterEntity = $ITILAlterEntity->canAddSolution();
 
     $insumoByChamado = [
@@ -39,27 +39,27 @@ function plugin_init_fillglpi () {
         ]
     ];
 
-    $PLUGIN_HOOKS['timeline_answer_actions'][PLUGIN_NAME] = $insumoByChamado;
-    $PLUGIN_HOOKS['use_massive_action'][PLUGIN_NAME] = 1;
-    $PLUGIN_HOOKS['menu_toadd'][PLUGIN_NAME] = [
-        'helpdesk'  => GlpiPlugin\FillGlpi\Limpeza::class,
+    $PLUGIN_HOOKS['timeline_answer_actions']['fillglpi'] = $insumoByChamado;
+    $PLUGIN_HOOKS['use_massive_action']['fillglpi'] = 1;
+    $PLUGIN_HOOKS['menu_toadd']['fillglpi'] = [
+        'helpdesk'  => GlpiPlugin\Fillglpi\Limpeza::class,
         'assets'    => [
-            GlpiPlugin\FillGlpi\Battery::class,
-            GlpiPlugin\FillGlpi\Nobreak::class
+            GlpiPlugin\Fillglpi\Battery::class,
+            GlpiPlugin\Fillglpi\Nobreak::class
         ],
     ];
-    $PLUGIN_HOOKS['item_purge'][PLUGIN_NAME] = [
-        GlpiPlugin\FillGlpi\Limpeza::class => 'fillglpi_updateitem_called'
+    $PLUGIN_HOOKS['item_purge']['fillglpi'] = [
+        GlpiPlugin\Fillglpi\Limpeza::class => 'fillglpi_updateitem_called'
     ];
 
-    $PLUGIN_HOOKS['item_add'][PLUGIN_NAME] = [
+    $PLUGIN_HOOKS['item_add']['fillglpi'] = [
         \Reservation::class =>  'fillglpi_additem_called'
     ];
 
-    $PLUGIN_HOOKS['post_item_form'][PLUGIN_NAME] = 'fillglpi_params_hook';
+    $PLUGIN_HOOKS['post_item_form']['fillglpi'] = 'fillglpi_params_hook';
 
     Plugin::registerClass(
-        GlpiPlugin\FillGlpi\Reservation::class, [
+        GlpiPlugin\Fillglpi\Reservation::class, [
            'addtabon' => [
                 \ReservationItem::class
             ]
@@ -67,7 +67,7 @@ function plugin_init_fillglpi () {
     );
 
     Plugin::registerClass(
-        GlpiPlugin\FillGlpi\Limpeza::class, [
+        GlpiPlugin\Fillglpi\Limpeza::class, [
            'addtabon' => [
                 'Computer'
             ]
@@ -75,7 +75,7 @@ function plugin_init_fillglpi () {
     );
 
     Plugin::registerClass(
-        GlpiPlugin\FillGlpi\FillGlpiProfile::class, [
+        GlpiPlugin\Fillglpi\FillglpiProfile::class, [
            'addtabon' => [
                 'Profile'
             ]
@@ -83,9 +83,9 @@ function plugin_init_fillglpi () {
     );   
     
     Plugin::registerClass(
-        GlpiPlugin\FillGlpi\Battery::class, [
+        GlpiPlugin\Fillglpi\Battery::class, [
            'addtabon' => [
-                GlpiPlugin\FillGlpi\Nobreak::class
+                GlpiPlugin\Fillglpi\Nobreak::class
             ]
         ]
     ); 
@@ -93,7 +93,7 @@ function plugin_init_fillglpi () {
 
 function plugin_version_fillglpi () {
     return [
-        'name'           => ucfirst(PLUGIN_NAME),
+        'name'           => ucfirst('fillglpi'),
         'version'        => PLUGIN_FILLGLPI_VERSION,
         'author'         => 'Ruan',
         'license'        => '',
@@ -118,7 +118,7 @@ function plugin_fillglpi_check_config ($verbose = false)
     }
 
     if ($verbose) {
-        echo __('Installed / not configured', PLUGIN_NAME);
+        echo __('Installed / not configured', 'fillglpi');
     }
     return false;
 }

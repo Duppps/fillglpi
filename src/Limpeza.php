@@ -1,5 +1,5 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 use CommonDBTM;
 use CommonGLPI;
@@ -64,7 +64,7 @@ class Limpeza extends CommonDBTM {
       $consumables = $DB->request([
          'FROM'   => 'glpi_consumables',
          'WHERE'  => [
-            'itemtype'  => 'GlpiPlugin\\FillGlpi\\Limpeza',
+            'itemtype'  => 'GlpiPlugin\\Fillglpi\\Limpeza',
             'items_id'  => $idItem
          ]
       ]);

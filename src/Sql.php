@@ -1,6 +1,6 @@
 <?php
 
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
 class Sql {
     public static function getConsumableItemTypes() {

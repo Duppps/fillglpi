@@ -1,7 +1,7 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
-use GlpiPlugin\FillGlpi\DateFormatter;
+use GlpiPlugin\Fillglpi\DateFormatter;
 use CommonDBTM;
 use CommonGLPI;
 use Session;

@@ -1,6 +1,6 @@
 <?php
 
-use GlpiPlugin\FillGlpi\NobreakModel;
+use GlpiPlugin\Fillglpi\NobreakModel;
 
 include ("../../../inc/includes.php");
 

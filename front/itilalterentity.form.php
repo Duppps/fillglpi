@@ -1,5 +1,5 @@
 <?php
-use GlpiPlugin\FillGlpi\BD;
+use GlpiPlugin\Fillglpi\BD;
 use Glpi\Event;
 use Session;
 use ITILFollowup;

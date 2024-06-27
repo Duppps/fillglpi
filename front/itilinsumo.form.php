@@ -1,6 +1,6 @@
 <?php
-use GlpiPlugin\FillGlpi\ITILInsumo;
-use GlpiPlugin\FillGlpi\BD;
+use GlpiPlugin\Fillglpi\ITILInsumo;
+use GlpiPlugin\Fillglpi\BD;
 use Glpi\Event;
 use Session;
 use ITILFollowup;

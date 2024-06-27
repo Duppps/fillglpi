@@ -1,7 +1,7 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
-use GlpiPlugin\FillGlpi\Sql;
+use GlpiPlugin\Fillglpi\Sql;
 use CommonDBTM;
 use Glpi\Application\View\TemplateRenderer;
 

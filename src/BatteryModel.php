@@ -1,7 +1,7 @@
 <?php
-namespace GlpiPlugin\FillGlpi;
+namespace GlpiPlugin\Fillglpi;
 
-use GlpiPlugin\FillGlpi\Form;
+use GlpiPlugin\Fillglpi\Form;
 use CommonDropdown;
 
 class BatteryModel extends CommonDropdown {
