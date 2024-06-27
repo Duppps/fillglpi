@@ -15,7 +15,7 @@ class FillGlpiProfile extends Profile {
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
         switch ($item->getType()) {
             case 'Profile':
-                return self::createTabEntry(__('Fillglpi', 'fillglpi'));            
+                return self::createTabEntry(__('FillGlpi', 'fillglpi'));            
         }
 
         return '';
@@ -45,7 +45,7 @@ class FillGlpiProfile extends Profile {
         echo "<table class='tab_cadre_fixe'>";
 
 
-        $title = __('Fillglpi', 'fillglpi');
+        $title = __('FillGlpi', 'fillglpi');
 
         $profile->displayRightsChoiceMatrix(
             [

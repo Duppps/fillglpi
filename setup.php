@@ -93,7 +93,7 @@ function plugin_init_fillglpi () {
 
 function plugin_version_fillglpi () {
     return [
-        'name'           => ucfirst('fillglpi'),
+        'name'           => 'FillGlpi',
         'version'        => PLUGIN_FILLGLPI_VERSION,
         'author'         => 'Ruan',
         'license'        => '',
