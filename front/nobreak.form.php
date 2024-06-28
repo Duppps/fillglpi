@@ -27,7 +27,7 @@ if (isset($_POST['add'])) {
 
    Html::redirect($obj->getLinkURL());
 } else if (isset($_POST["delete"])) {   
-   $where = ' plugin_cotrisoja_nobreaks_id = '.$_POST['id'];
+   $where = ' plugin_fillglpi_nobreaks_id = '.$_POST['id'];
    Battery::out($where);   
 
    $obj->check($_POST['id'], PURGE, $_POST);

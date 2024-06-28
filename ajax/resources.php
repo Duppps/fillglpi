@@ -21,7 +21,7 @@ if (isset($_GET['item'])) {
     
     $resources['Item'] = Sql::getSpecificField('name', $tableItem, $itemID, 'id');
 
-    $resourcesData = Sql::getValuesByID($idItem, 'glpi_plugin_cotrisoja_resources', 'reservationitems_id');
+    $resourcesData = Sql::getValuesByID($idItem, 'glpi_plugin_fillglpi_resources', 'reservationitems_id');
 
     foreach ($resourcesData as $data) {
         $resources['resources'][] = [

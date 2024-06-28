@@ -1,7 +1,7 @@
 <?php
 include('../../../inc/includes.php');
 
-Session::checkRight('plugin_cotrisoja_limpezas', READ);
+Session::checkRight('plugin_fillglpi_limpezas', READ);
 
 Html::header(
     GlpiPlugin\Fillglpi\Limpeza::getTypeName(Session::getPluralNumber()),
