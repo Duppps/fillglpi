@@ -70,21 +70,7 @@ function plugin_fillglpi_install() {
                     KEY `plugin_fillglpi_nobreaks_id` (`plugin_fillglpi_nobreaks_id`) 
                 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
         $DB->doQueryOrDie($query, $DB->error());
-    }
-
-    if (!$DB->tableExists('glpi_plugin_fillglpi_batteries')) {
-        $query =  "CREATE TABLE `glpi_plugin_fillglpi_batteries` (
-                    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                    `expire_date` DATE NOT NULL,
-                    `name` VARCHAR(50) DEFAULT NULL,
-                    `plugin_fillglpi_batterymodels_id` INT(11) UNSIGNED NOT NULL,         
-                    `plugin_fillglpi_nobreaks_id` INT(11) UNSIGNED,                                  
-                    PRIMARY KEY (`id`),
-                    KEY `plugin_fillglpi_batterymodels_id` (`plugin_fillglpi_batterymodels_id`),
-                    KEY `plugin_fillglpi_nobreaks_id` (`plugin_fillglpi_nobreaks_id`) 
-                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
-        $DB->doQueryOrDie($query, $DB->error());
-    }
+    }    
 
     if (!$DB->tableExists('glpi_plugin_fillglpi_resources')) {
         $query =  "CREATE TABLE `glpi_plugin_fillglpi_resources` (
