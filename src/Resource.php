@@ -84,10 +84,17 @@ class Resource extends CommonDropdown {
     }
 
     public static function create($idResource, $idReservation) {
-        Sql::insert('glpi_plugin_cotrisoja_reservations_resources', [
-            'plugin_cotrisoja_resources_id'     =>  $idResource,
-            'plugin_cotrisoja_reservations_id'  =>  $idReservation
-        ]);
+        global $DB;
+
+        $iditem = $DB->request('SELECT reservationitems_id FROM glpi_reservations WHERE id = '.$idReservation);
+        $iditemRes = Sql::getValuesByID($idResource, 'glpi_plugin_cotrisoja_resources');
+
+        if ($iditem->current()['reservationitems_id'] == $iditemRes->current()['reservationitems_id']) {
+            Sql::insert('glpi_plugin_cotrisoja_reservations_resources', [
+                'plugin_cotrisoja_resources_id'     =>  $idResource,
+                'plugin_cotrisoja_reservations_id'  =>  $idReservation
+            ]);            
+        }         
     }
 
     public function getAll() {
