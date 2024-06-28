@@ -82,12 +82,18 @@ class Resource extends CommonDropdown {
           
         return true;
     }
+   
 
     public static function create($idResource, $idReservation) {
-        Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
-            'plugin_fillglpi_resources_id'     =>  $idResource,
-            'plugin_fillglpi_reservations_id'  =>  $idReservation
-        ]);
+        $iditem = Sql::getSpecificField('reservationitems_id', 'glpi_reservations', $idReservation, 'id');
+        $iditemRes = Sql::getSpecificField('reservationitems_id', 'glpi_plugin_fillglpi_resources', $idResource, 'id');
+
+        if ($iditem == $iditemRes) {
+            Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
+                'plugin_fillglpi_resources_id'     =>  $idResource,
+                'plugin_fillglpi_reservations_id'  =>  $idReservation
+            ]);            
+        }         
     }
 
     public function getAll() {
