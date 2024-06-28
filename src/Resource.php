@@ -84,12 +84,10 @@ class Resource extends CommonDropdown {
     }
 
     public static function create($idResource, $idReservation) {
-        global $DB;
+        $iditem = Sql::getSpecificField('reservationitems_id', 'glpi_reservations', $idReservation, 'id');
+        $iditemRes = Sql::getSpecificField('reservationitems_id', 'glpi_plugin_cotrisoja_resources', $idResource, 'id');
 
-        $iditem = $DB->request('SELECT reservationitems_id FROM glpi_reservations WHERE id = '.$idReservation);
-        $iditemRes = Sql::getValuesByID($idResource, 'glpi_plugin_cotrisoja_resources');
-
-        if ($iditem->current()['reservationitems_id'] == $iditemRes->current()['reservationitems_id']) {
+        if ($iditem == $iditemRes) {
             Sql::insert('glpi_plugin_cotrisoja_reservations_resources', [
                 'plugin_cotrisoja_resources_id'     =>  $idResource,
                 'plugin_cotrisoja_reservations_id'  =>  $idReservation
