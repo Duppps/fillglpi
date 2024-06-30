@@ -7,4 +7,3 @@
  - Add resources into reservations form
  - View reservations info
 
-dirt code but its works
