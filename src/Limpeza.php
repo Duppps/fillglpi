@@ -16,7 +16,7 @@ class Limpeza extends CommonDBTM {
    }
   
    public static function getIcon() {
-      return 'fas fa-wrench';
+      return 'fas fa-broom';
    }    
 
    public function showForm($ID, array $options = []) {     
