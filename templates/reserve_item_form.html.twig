@@ -11,66 +11,158 @@
     </td>
 </tr>
 
+<div class="modal fade" id="modalCalendar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="calendar"></div>
+      </div>      
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
+    $(document).ready(function() {
+
     function hasItemLikeParam(values) {
         let params = new URLSearchParams(window.location.search);
-
         for (let key of params.keys()) {
             if (key.startsWith('item')) {
-                values.push(params.get(key)); 
+                values.push(params.get(key));
             }
         }
-
-        return values.length > 0; 
+        return values.length > 0;
     }
-    
-    items = [];
-    
-    if (hasItemLikeParam(items)) {
-        items.forEach((item) => {
-            $.get("{{ path('/plugins/fillglpi/ajax/resources.php') }}", {item: item}, function(response) {
-                if (response.resources.length > 0) {
-                    let tr = $('<tr>');
-                    let title = $('<td>').text('Recursos para ' + response.Item);
-                    let resources = $('<td>');
-                    let resourcesTable = $('<table>'); 
 
-                    response.resources.forEach((item) => {
-                        let form = `
-                            <tr>
-                                <td>
-                                    <input class="form-check-input" type="checkbox" id="resource_id_${item.id}" name="resource_id_${item.id}" value="${item.id}"/>
-                                </td>
-                                <td>
-                                    <label class="form-check-label" for="resource_id_${item.id}">${item.name}</label>
-                                </td>
-                            </tr>
-                        `;
-                        resourcesTable.append(form); 
-                    });
+    function initializeResources() {
+        $(".row_resources").remove(); 
+        let items = [];
 
-                    resources.append(resourcesTable); 
-                    tr.append(title);
-                    tr.append(resources);
+        if (hasItemLikeParam(items)) {
+            items.forEach(item => {                
+                getResources(item, $("input[name^='resa[begin]']").val(), $("select[name^='resa[_duration]']").find(":selected").val());
+            });
+        } else {
+            $("#tr_quantity").hide().append(`<input type='text' name="type_reserve" value='unique' style='display: none' />`);
+        }
+    }
 
-                    let submitButton = $(".tab_cadre").find('tr').eq(-1);
+    //$("input[name^='resa[begin]']").on('change', function() {
+    //    initializeResources();
+    //});
 
-                    if (submitButton.length > 0) {
-                        submitButton.before(tr);
-                    } else {
-                        $(".tab_cadre").append(tr);
+    //$("select[name^='resa[_duration]']").on('change', function() { 
+    //    initializeResources();
+    //});
+
+    let timeout;
+    const debounce = function(func, wait) {
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
+
+    const handleInputChange = debounce(initializeResources, 300);
+
+    $("input[name^='resa[begin]']").on('change', handleInputChange);
+    $("select[name^='resa[_duration]']").on('change', handleInputChange);
+
+    function getResources(item, dateBegin, secondsEnd) {
+        const dateEnd = calculateEndDate(dateBegin, secondsEnd);
+
+        $.get("{{ path('/plugins/fillglpi/ajax/resources.php') }}", {item: item, dateBegin: dateBegin, dateEnd: dateEnd}, function(response) {
+            if (response.resources.length > 0) {
+                let title = $('<td>').text('Recursos para ' + response.Item);
+                let resources = $('<td>');
+                let tr = $('<tr>');
+                let resourcesTable = $('<table>');
+
+                response.resources.forEach(resource => {
+                    let disabled = "";
+                    let title_reserved = "";
+                    let icon_reserved = "";
+
+                    if (resource.availability === false) {
+                        disabled = "disabled";
+                        title_reserved = "title='Recurso já reservado nesse horário'";
+                        icon_reserved = '<i class="fa-regular fa-clock"></i>';
+                        //calendar = `<a href="#" onclick="getRecoursesAvailability(${resource.id})" data-bs-toggle="modal" data-bs-target="#modalCalendar"><i class="fa-regular fa-calendar"></i></a>`; #}
                     }
-                }
-            }, 'json');
-        });
-    } else {
-        delete items;
-        let element = $("#tr_quantity");
-        element.hide();    
 
-        element.append().html(
-            `<input type='text' name='type_reserve' value='unique' style='display: none' />`
-        );
+                    let form = `
+                        <tr ${title_reserved}>
+                            <td style="width: 1%">
+                                <input class="form-check-input" type="checkbox" id="${resource.id}_${resource.for}" name="resource_id_${resource.id}_${resource.for}" value="${resource.id}" ${disabled} />
+                            </td>
+                            <td>
+                                <label class="form-check-label d-inline" for="${resource.id}_${resource.for}">${resource.name}</label>
+                                ${icon_reserved}
+                            </td>
+                        </tr>
+                    `;
+
+                    resourcesTable.append(form);
+                });
+
+                resources.append(resourcesTable);
+                tr.append(title);
+                tr.append(resources);
+
+                resourcesTable.addClass("w-100");
+                tr.addClass("row_resources");
+
+                let submitButton = $(".tab_cadre").find('tr').eq(-1);
+
+                if (submitButton.length > 0) {
+                    submitButton.before(tr);
+                } else {
+                    $(".tab_cadre").append(tr);
+                }
+            }
+        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("Erro na requisição AJAX:", errorThrown);
+            alert("Ocorreu um erro ao carregar os recursos. Por favor, tente novamente.");
+        });
     }
+
+    function calculateEndDate(startDate, durationInSeconds) {
+        const durationInMilliseconds = durationInSeconds * 1000;
+        const start = new Date(startDate);
+        const endDate = new Date(start.getTime() + durationInMilliseconds);
+
+        const year = endDate.getFullYear();
+        const month = String(endDate.getMonth() + 1).padStart(2, '0');
+        const day = String(endDate.getDate()).padStart(2, '0');
+        const hours = String(endDate.getHours()).padStart(2, '0');
+        const minutes = String(endDate.getMinutes()).padStart(2, '0');
+        const seconds = String(endDate.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    initializeResources();
+});
+
+function getRecoursesAvailability(resourceID) {
+    $.get("{{ path('/plugins/fillglpi/ajax/resources.php') }}", {resourceCalendarID: resourceID}, function(response) {
+        $("#calendar").empty();
+        response.forEach((i) => {
+            $("#calendar").append(`
+                <tr>
+                    <td class="p-2">${i.begin}</td>
+                    <td class="p-2">${i.end}</td>
+                </tr>
+            `);
+        });
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Erro na requisição AJAX:", errorThrown);
+        alert("Ocorreu um erro ao verificar a disponibilidade do recurso. Por favor, tente novamente.");
+    });
+}
 </script>
+

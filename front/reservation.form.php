@@ -15,14 +15,22 @@ if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
 Session::checkLoginUser();
 
 if (isset($_POST['add'])) {
-    foreach ($_POST as $i => $key) {
-        if (strpos($i, 'resource_id_') !== false) {
-            Resource::create($key, $_POST['reservations_id']);
-        }
-    } 
-    
+    $_POST['reservations_id'] = $_GET['id'];
+
     $obj->check(-1, CREATE, $_POST);
     $obj->add($_POST);
+
+    foreach ($_POST as $i => $key) {
+        if (strpos($i, 'resource_id_') !== false) { 
+            if (!Resource::create($key, $_POST['reservations_id'])) {
+                Session::addMessageAfterRedirect(
+                    __('Resource not avaible for this date'),
+                    false,
+                    ERROR
+                );
+            }          
+        }
+    } 
     
     $ri = new \ReservationItem();
     $ri->redirectToList();

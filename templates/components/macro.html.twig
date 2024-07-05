@@ -215,7 +215,7 @@
     <input type="number" name="{{ name }}" id="{{ name }}" value="{{ value }}"></input>
 {% endmacro %}
 
-{% macro genericInput(name, type, value = '', label = '', display = 'true') %}
+{% macro genericInput(name, type, value = '', label = '', display = 'true', disabled = "") %}
     {% if type == "checkbox" %}
         {% set classFormCheck = "form-check" %}
     {% endif %}
@@ -225,10 +225,10 @@
             {% set displayNone = 'display:none;' %}
         {% else %}
             {% set tagLabel %}
-                <label class="form-check-label" for="{{ name }}">{{label}}</label>
+                <label class="form-check-label" for="{{ name }}">{{label|raw}}</label>
             {% endset %}
         {% endif %}
-        <input class="form-check-input" type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" style="{{ displayNone }}"/>
+        <input class="form-check-input" type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ disabled }} style="{{ displayNone }}"/>
         {{ tagLabel }}
     </div>
 {% endmacro %}
@@ -246,5 +246,148 @@
             {% endif %}
         {% endfor %}
     </select>
+
+{% endmacro %}
+
+{% macro multiSelectWithValues(name, label, values, current_value = '') %}
+
+    <label for="dropdown_trigger" class="form-label">{{label}}</label>
+    <div class="dropdown_wrap">
+        <button id="dropdown_trigger" class="dropdown_trigger d-flex justify-content-between align-items-center" type="button" onclick="toggleDropdown(event)">
+            Selecione algum item
+            <i class="fa-solid fa-caret-down" id="dropdown_icon"></i>
+        </button>
+        <div class="dropdown_box" id="dropdown_box" style="display: none;">
+            <ul>
+            {% for b in values %}       
+                <li>     
+                    <input type="checkbox" class="checkbox_dropdown" id="item_id_{{ b.id }}" name="item_id_{{ b.id }}" value="{{ b.id }}" />
+                    <label for="item_id_{{ b.id }}">{{ b.itemTypeName }}</label>
+                </li>
+            {% endfor %} 
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-3 border d-flex flex-wrap rounded p-1" id="itemsView" style="min-height: 40px"></div>
+
+    <script type="text/javascript">
+        const dropdownBox = $("#dropdown_box");
+        const dropdownTrigger = $(".dropdown_trigger");
+        const dropdownChecks = $(".checkbox_dropdown");
+        const valuesCurrent = {{current_value|json_encode|raw}};
+
+        $(document).ready(() => {
+            valuesCurrent.forEach((i) => {
+                if ($("#item_id_"+i.id).val() == i.id) {
+                    const itemId = i.id;
+                    const itemName = $('label[for="item_id_' + itemId + '"]').text();
+
+                    $("#item_id_"+i.id).prop("checked", true);
+                    $('#itemsView').append('<span id="exib_it' + itemId + '" class="selected-item border rounded-pill px-2 py-1 m-1" data-value="' + itemId + '">'+ itemName +'</span>');
+                }
+            })
+        })
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            if (dropdownBox.is(":hidden")) {  
+                $("#dropdown_icon").removeClass('fa-caret-down');     
+                $("#dropdown_icon").addClass('fa-caret-up');       
+                dropdownBox.show();                
+            } else {
+                $("#dropdown_icon").removeClass('fa-caret-up');     
+                $("#dropdown_icon").addClass('fa-caret-down');   
+                dropdownBox.hide();
+            }
+        }
+
+        dropdownChecks.on("change", (e) => {
+            const itemId = $(e.target).val();
+
+            if (e.target.checked) {
+                const itemName = $('label[for="item_id_' + itemId + '"]').text();
+                $('#itemsView').append('<span id="exib_it' + itemId + '" class="selected-item border rounded-pill px-2 py-1 m-1" data-value="' + itemId + '">'+ itemName +'</span>');
+            } else {
+                $('#exib_it' + itemId).remove();
+            }
+            
+        });
+
+        $(document).on("click", (event) => {
+            if (!dropdownTrigger.is(event.target) && dropdownTrigger.has(event.target).length === 0 && !dropdownBox.is(event.target) && dropdownBox.has(event.target).length === 0) {
+                if (!dropdownBox.is(":hidden")) {
+                    $("#dropdown_icon").removeClass('fa-caret-up');     
+                    $("#dropdown_icon").addClass('fa-caret-down');   
+                    dropdownBox.hide();
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .dropdown_trigger {
+            border: 0.5px solid rgb(230, 230, 230);
+            background-color: #ffff;
+            border-radius: 6px;
+            width: 100%;
+            text-align: left;
+            padding: 10px 20px;
+            font-size: 0.9rem;                        
+        }
+
+        .dropdown_box {
+            z-index: 2;
+            position: absolute;     
+            background-color: white;  
+            border: 0.5px solid rgb(230, 230, 230);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .dropdown_box ul {
+            padding: 10px 10px 0 30px;
+            list-style: none;      
+        }
+
+        .dropdown_box li {
+            margin: 10px 0px;
+        }
+
+        .dropdown_wrap {
+            position: relative;
+        }
+    
+    </style>
+
+{% endmacro %}
+
+{% macro selectEntities(name, values) %}
+
+    <label for="select_entities" class="form-label mt-2">Selecione o setor alvo</label>
+    <select name="{{name}}" id="select_entities"></select>
+    
+    <script type="text/javascript">
+        const val = {{values|json_encode|raw}};
+        $(document).ready(() => {          
+            $.get(
+                "{{ path('/plugins/fillglpi/ajax/entidades.php') }}",
+                {getAllEntities: "getAllEntities"},
+                function(response) {
+                    response.forEach((item) => {
+                        let selected = '';
+
+                        if (item.id === val) {
+                            selected = 'selected';
+                        }
+
+                        $("#select_entities").append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+                    })                    
+                }
+            )
+        })        
+    </script>
 
 {% endmacro %}

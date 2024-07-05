@@ -3,6 +3,8 @@
 namespace GlpiPlugin\Fillglpi;
 
 use CommonDropdown;
+use Session;
+use Html;
 use Glpi\Application\View\TemplateRenderer;
 
 class Resource extends CommonDropdown {
@@ -24,31 +26,34 @@ class Resource extends CommonDropdown {
             'name'               => __('Name'),
             'datatype'           => 'itemlink',
             'massiveaction'      => true
-        ];   
-        
+        ];
+
         $tab[] = [
             'id'                 => '3',
-            'table'              => 'glpi_reservationitems',
-            'field'              => 'itemtype',
-            'joinparams'         => [  
-                'beforejoin'  => [
-                    'table'      => $this::getTable(),
-                    'field'      => 'plugin_fillglpi_reservationitems_id',
-                    'jointype'   => 'itemtype_item',                    
-                ]            
-            ],
-            'name'               => __('Item'),
+            'table'              => $this::getTable(),
+            'field'              => 'stock',
+            'name'               => __('Stock'),
             'datatype'           => 'itemlink',
             'massiveaction'      => true
-        ]; 
+        ];
 
         return $tab;
     }
 
     public function showForm($ID, array $options = []) {  
+        global $DB;
         $resource = [];
         $items = [];
+        $actualItems = [];
+
         $resourceResults = Sql::getValuesByID($ID, 'glpi_plugin_fillglpi_resources');
+        $resourcesReservationItems = $DB->request(
+            'SELECT *
+                FROM glpi_reservationitems
+                INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems
+                    ON glpi_plugin_fillglpi_resources_reservationsitems.reservationitems_id = glpi_reservationitems.id
+                WHERE glpi_plugin_fillglpi_resources_reservationsitems.plugin_fillglpi_resources_id = '.$ID
+            );
 
         foreach (Sql::getAllValues('glpi_reservationitems') as $item) {
             $table = getTableForItemType($item['itemtype']);
@@ -64,10 +69,18 @@ class Resource extends CommonDropdown {
             
         }
 
+        foreach ($resourcesReservationItems as $i) {
+            $actualItems[] = [
+                'id'    =>  $i['reservationitems_id'],
+                'name'  =>  Sql::getSpecificField('name', getTableForItemType($i['itemtype']), $i['items_id'], 'id')
+            ];
+        }
+
         foreach ($resourceResults as $result) {
             $resource = [
-                'name'                  =>  $result['name'],
-                'reservationitems_id'   =>  $result['reservationitems_id']
+                'name'                         =>  $result['name'],
+                'stock'                        =>  $result['stock'],
+                'ticket_entities_id'           =>  $result['ticket_entities_id']
             ];
         }        
 
@@ -76,7 +89,8 @@ class Resource extends CommonDropdown {
             [
                 'id'            =>  $ID,
                 'current_value' =>  $resource,
-                'items_value'   =>  $items
+                'items_value'   =>  $items,
+                'current_items' =>  $actualItems
             ]
         );    
           
@@ -85,15 +99,47 @@ class Resource extends CommonDropdown {
    
 
     public static function create($idResource, $idReservation) {
-        $iditem = Sql::getSpecificField('reservationitems_id', 'glpi_reservations', $idReservation, 'id');
-        $iditemRes = Sql::getSpecificField('reservationitems_id', 'glpi_plugin_fillglpi_resources', $idResource, 'id');
+        $reservationData = Sql::getValuesByID($idReservation, 'glpi_reservations')->current();
+        $resourceData = Sql::getValuesByID($idResource, 'glpi_plugin_fillglpi_resources_reservationsitems')->current();
+
+        $iditem = $reservationData['reservationitems_id'];
+        $iditemRes = $resourceData['reservationitems_id'];
 
         if ($iditem == $iditemRes) {
-            Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
-                'plugin_fillglpi_resources_id'     =>  $idResource,
-                'plugin_fillglpi_reservations_id'  =>  $idReservation
-            ]);            
-        }         
+            if (Sql::getAvailabilityResource($resourceData['plugin_fillglpi_resources_id'], $reservationData['begin'], $reservationData['end'])) {
+                Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
+                    'plugin_fillglpi_resources_reservationsitems_id'        =>  $idResource,
+                    'plugin_fillglpi_reservations_id'                       =>  $idReservation
+                ]);               
+
+                $resourceTarget = Sql::getValuesByID($resourceData['plugin_fillglpi_resources_id'], 'glpi_plugin_fillglpi_resources')->current();
+
+                if ($resourceTarget['ticket_entities_id']) {
+                    $ticket = [
+                        'entities_id'       =>  $resourceTarget['ticket_entities_id'],
+                        'name'              =>  'Reserva para '.$resourceTarget['name'],
+                        'content'           =>  'Reserva para o '.$resourceTarget['name'].' na data '.$reservationData['begin'],
+                        'date'              =>  date('Y-m-d h:i:s', time()),
+                        'requesttypes_id'   =>  1,
+                        'status'            =>  1
+                    ];
+
+                    $track = new \Ticket();
+                    //$track->check(-1, CREATE, $ticket);
+                    $track->add($ticket);
+                }
+
+                return true;
+            } else {
+                Session::addMessageAfterRedirect(
+                    __('Recurso não disponível'),
+                    false,
+                    ERROR
+                );
+            }   
+        }          
+         
+        return false;      
     }
 
     public function getAll() {
@@ -109,5 +155,24 @@ class Resource extends CommonDropdown {
         }
 
         return $response;
+    }
+
+    public static function removeFromResourcesReservationItems($id) {
+        Sql::remove('glpi_plugin_fillglpi_resources_reservationsitems', 'plugin_fillglpi_resources_id', $id);
+    }
+
+    public static function getResourceByItemTypeAndCheckAvailability($idItemType, $dateStart, $dateEnd) {
+        $data = [];
+
+        foreach (Sql::getResourcesByItemType($idItemType) as $i) {      
+
+            $data[] = [
+                'id'            =>  $i['id'],
+                'name'          =>  $i['name'],
+                'availability'  =>  Sql::getAvailabilityResource($i['resID'], $dateStart, $dateEnd)
+            ];
+        }        
+
+        return $data;
     }
 }

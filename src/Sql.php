@@ -2,8 +2,10 @@
 
 namespace GlpiPlugin\Fillglpi;
 
-class Sql {
-    public static function getConsumableItemTypes() {
+class Sql
+{
+    public static function getConsumableItemTypes()
+    {
         global $DB;
         $response = [];
 
@@ -18,12 +20,13 @@ class Sql {
 
         return $response;
     }
-    
-    public static function getConsumableItemsByItemTypes($itemtype) {
+
+    public static function getConsumableItemsByItemTypes($itemtype)
+    {
         global $DB;
         $response = [];
 
-        $object = $DB->request('SELECT * FROM glpi_consumableitems WHERE consumableitemtypes_id = '.$itemtype.'');
+        $object = $DB->request('SELECT * FROM glpi_consumableitems WHERE consumableitemtypes_id = ' . $itemtype . '');
 
         foreach ($object as $item) {
             $response[] = [
@@ -37,11 +40,12 @@ class Sql {
         return $response;
     }
 
-    public static function getConsumablesInStockByConsumableItems($consumableItem) {
+    public static function getConsumablesInStockByConsumableItems($consumableItem)
+    {
         global $DB;
         $response = [];
 
-        $object = $DB->request('SELECT * FROM glpi_consumables WHERE consumableitems_id = '.$consumableItem.'');
+        $object = $DB->request('SELECT * FROM glpi_consumables WHERE consumableitems_id = ' . $consumableItem . '');
 
         foreach ($object as $item) {
             $response[] = [
@@ -57,17 +61,18 @@ class Sql {
         return $response;
     }
 
-    public static function getUsedConsumablesByItemType($itemType, $ID, $consumableItem) {
+    public static function getUsedConsumablesByItemType($itemType, $ID, $consumableItem)
+    {
         global $DB;
         $response = [];
 
         if (!isset($ID)) {
             $andItemType = '';
         } else {
-            $andItemType = ' AND itemtype = "'.$itemType.'"';
+            $andItemType = ' AND itemtype = "' . $itemType . '"';
         }
 
-        $object = $DB->request('SELECT * FROM glpi_consumables WHERE consumableitems_id = '.$consumableItem.$andItemType.'  AND items_id = '.$ID.' AND date_out IS NOT NULL');
+        $object = $DB->request('SELECT * FROM glpi_consumables WHERE consumableitems_id = ' . $consumableItem . $andItemType . '  AND items_id = ' . $ID . ' AND date_out IS NOT NULL');
 
         foreach ($object as $item) {
             $response[] = [
@@ -81,52 +86,60 @@ class Sql {
         }
 
         return $response;
-    }  
-    
-    public static function insert($table, $data) {
-        global $DB;                  
+    }
+
+    public static function insert($table, $data)
+    {
+        global $DB;
 
         $columns = array_keys($data);
         $values = array_values($data);
 
         $columns_string = implode(',', $columns);
         $rows_string = implode('","', $values);
-    
+
         $DB->request('INSERT INTO ' . $table . ' (' . $columns_string . ') VALUES ("' . $rows_string . '")');
-    
+
         return true;
     }
 
-    public static function update($parameters) {
+    public static function update($parameters)
+    {
         global $DB;
 
-        $DB->request('UPDATE'.$parameters);
+        $DB->request('UPDATE' . $parameters);
     }
 
-    public static function getValuesByID($ID, $table, $field = 'id') {
+    public static function getValuesByID($ID, $table, $field = 'id')
+    {
         global $DB;
 
-        return $DB->request(['FROM' => $table, 'WHERE' => [$field => $ID]]);        
+        return $DB->request(['FROM' => $table, 'WHERE' => [$field => $ID]]);
     }
 
-    public static function getAllValues($table) {
+    public static function getAllValues($table)
+    {
         global $DB;
 
-        $response = $DB->request(['FROM' => $table]);                 
-        
-        return $response;        
+        $response = $DB->request(['FROM' => $table]);
+
+        return $response;
     }
 
-    public static function describe($table) {
+    public static function describe($table)
+    {
         global $DB;
 
-        return $DB->request('DESCRIBE '.$table);
+        return $DB->request('DESCRIBE ' . $table);
     }
 
-    public static function getSpecificField($field, $table, $qryValue, $qryField) {
+    public static function getSpecificField($field, $table, $qryValue, $qryField)
+    {
         global $DB;
 
-        $rest = $DB->request('SELECT '.$field.' FROM '.$table.' WHERE '.$qryField.' = '.$qryValue);
+        $return = '';
+
+        $rest = $DB->request('SELECT ' . $field . ' FROM ' . $table . ' WHERE ' . $qryField . ' = ' . $qryValue);
 
         foreach ($rest as $r) {
             $return = $r[$field];
@@ -135,7 +148,8 @@ class Sql {
         return $return;
     }
 
-    public static function getOpenReservationInfo($status) {
+    public static function getOpenReservationInfo($status)
+    {
         global $DB;
         $response = [];
 
@@ -162,7 +176,7 @@ class Sql {
             INNER JOIN 
                 glpi_reservationitems gri ON gr.reservationitems_id = gri.id
             WHERE 
-                gr.begin ".$opr." CURRENT_DATE()
+                gr.begin " . $opr . " CURRENT_DATE()
             ORDER BY gr.begin           
         ";
 
@@ -179,20 +193,21 @@ class Sql {
                 'user'      =>  $r['user_name'],
                 'begin'     =>  DateFormatter::formatToBr($r['begin']),
                 'end'       =>  DateFormatter::formatToBr($r['end'])
-            ];            
-        }      
-        
+            ];
+        }
+
         return $response;
     }
 
     /**
-    * Return core informations about the reservation
-    *
-    * @param int $ID Reservation (glpi_reservation) ID
+     * Return core informations about the reservation
+     *
+     * @param int $ID Reservation (glpi_reservation) ID
 
-    * @return array data from reservation
-    */ 
-    public static function getReservationInfo(int $ID) {
+     * @return array data from reservation
+     */
+    public static function getReservationInfo(int $ID)
+    {
         global $DB;
         $response = [];
         $resources = [];
@@ -207,7 +222,8 @@ class Sql {
                 gri.itemtype,
                 gri.items_id,
                 gri.id AS reservationItemID,
-                gpc.people_quantity
+                gpc.people_quantity,
+                frr.plugin_fillglpi_resources_id AS resourceItemID
             FROM 
                 glpi_reservations gr
             INNER JOIN 
@@ -216,8 +232,10 @@ class Sql {
                 glpi_users gu ON gr.users_id = gu.id
             INNER JOIN 
                 glpi_reservationitems gri ON gr.reservationitems_id = gri.id
+            INNER JOIN
+                glpi_plugin_fillglpi_resources_reservationsitems frr ON gri.id = frr.reservationitems_id
             WHERE 
-                gr.id = ".$ID."
+                gr.id = " . $ID . "
         ";
 
         $result = $DB->request($query);
@@ -225,13 +243,11 @@ class Sql {
         foreach ($result as $r) {
             $itemTable = getTableForItemType($r['itemtype']);
             $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
-            $itemName = $itemDetails->current()['name']; 
-            
-            foreach (self::getValuesByID($r['reservation_id'], 'glpi_plugin_fillglpi_reservations_resources', 'plugin_fillglpi_reservations_id') as $b) {
-                foreach (self::getValuesByID($b['plugin_fillglpi_resources_id'], 'glpi_plugin_fillglpi_resources') as $c) {
-                    array_push($resources, $c['name']);
-                }    
-            }      
+            $itemName = $itemDetails->current()['name'];
+
+            foreach (self::getValuesByID($r['resourceItemID'], 'glpi_plugin_fillglpi_resources') as $c) {
+                array_push($resources, $c['name']);
+            }     
 
             $response[] = [
                 'user'              =>  $r['user_name'],
@@ -241,9 +257,100 @@ class Sql {
                 'comment'           =>  $r['comment'],
                 'peopleQuantity'    =>  $r['people_quantity'],
                 'recursos'          =>  $resources
-            ];                    
-        }      
-        
+            ];
+        }
+
+        return $response;
+    }
+
+    public static function getAllDataWithFieldAndOperator($table, $field, $field_value, $operator)
+    {
+        global $DB;
+
+        return $DB->request(['FROM' => $table, 'WHERE' => [$field => [$operator, $field_value]]]);
+    }
+
+    public static function remove($table, $criteria, $criteriaValue)
+    {
+        global $DB;
+
+        return $DB->delete($table, [$criteria => $criteriaValue]);
+    }
+
+    public static function getResourcesByItemType($id)
+    {
+        global $DB;
+        $a = [];
+
+        $items = $DB->request(
+            'SELECT reservation_resources.*, glpi_plugin_fillglpi_resources.name, glpi_plugin_fillglpi_resources.id as resID FROM glpi_plugin_fillglpi_resources
+                INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems reservation_resources
+                    ON reservation_resources.plugin_fillglpi_resources_id = glpi_plugin_fillglpi_resources.id
+                INNER JOIN glpi_reservationitems reservationitems
+                    ON reservationitems.id = reservation_resources.reservationitems_id
+                WHERE reservationitems.id = ' . $id . ''
+        );
+
+        foreach ($items as $r) {
+            $a[] = [
+                'id'    => $r['id'],
+                'name'  => $r['name'],
+                'resID' => $r['resID']
+            ];
+        }
+
+        return $a;
+    }
+
+    public static function getAvailabilityResource($id, $dateStart, $dateEnd) {
+        global $DB;
+
+        $items = $DB->request(
+            'SELECT COUNT(*) as count FROM glpi_reservations
+                INNER JOIN glpi_reservationitems resitem
+                    ON resitem.id = glpi_reservations.reservationitems_id
+                INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems resresvitems
+                    ON resresvitems.reservationitems_id = resitem.id
+                INNER JOIN glpi_plugin_fillglpi_resources resources
+                    ON resources.id = resresvitems.plugin_fillglpi_resources_id
+                WHERE
+                    (glpi_reservations.begin <= "' . $dateEnd . '") AND (glpi_reservations.end >= "' . $dateStart . '")
+                AND
+                    resources.id = ' . $id
+        );
+
+        $stock = self::getSpecificField('stock', 'glpi_plugin_fillglpi_resources', $id, 'id');
+
+        if ($items->current()['count'] >= $stock && $stock !== NULL) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function getReservationsResources($resource) {
+        global $DB;
+        $response = [];
+
+        $i = $DB->request(
+            'SELECT * FROM glpi_reservations
+                INNER JOIN glpi_plugin_fillglpi_reservations_resources grr
+                    ON grr.plugin_fillglpi_reservations_id = glpi_reservations.id
+                INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems gresres
+                    ON gresres.id = grr.plugin_fillglpi_resources_reservationsitems_id
+                INNER JOIN glpi_plugin_fillglpi_resources gresources
+                    ON gresources.id = gresres.plugin_fillglpi_resources_id
+                WHERE gresres.id = '.intval($resource)
+            );
+
+        foreach ($i as $a) {
+            $response[] = [
+                'id' => $a['id'],
+                'begin' => DateFormatter::formatToBr($a['begin']),
+                'end'   => DateFormatter::formatToBr($a['end'])
+            ];
+        }
+
         return $response;
     }
 }

@@ -11,4 +11,14 @@ class DateFormatter {
 
         return $formatedDate;
     }
+
+    public static function calculateEndDate($startDate, $seconds) {
+        $start = new \DateTime($startDate);
+        
+        $endDate = clone $start;
+        $endDate->add(new \DateInterval('PT'.$seconds.'S'));
+    
+        return $endDate->format('Y-m-d H:i:s');
+    }
+
 }
