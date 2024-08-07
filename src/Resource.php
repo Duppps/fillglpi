@@ -33,9 +33,18 @@ class Resource extends CommonDropdown {
             'table'              => $this::getTable(),
             'field'              => 'stock',
             'name'               => __('Stock'),
-            'datatype'           => 'itemlink',
+            'datatype'           => 'number',
             'massiveaction'      => true
         ];
+
+        $tab[] = [
+            'id'                 => '4',
+            'table'              => $this::getTable(),
+            'field'              => 'additionalOptions',
+            'name'               => __('Opções Adicionais'),
+            'datatype'           => 'bool',
+            'massiveaction'      => true
+        ];        
 
         return $tab;
     }
@@ -77,9 +86,21 @@ class Resource extends CommonDropdown {
         }
 
         foreach ($resourceResults as $result) {
+            if ($result['additionalOptions']) {
+                foreach (Sql::getValuesByID($result['id'], 'glpi_plugin_fillglpi_resource_additionaloptions', 'plugin_fillglpi_resources_id') as $i) {
+                    $additionalOptions[] = [
+                        'id'    =>  $i['id'],
+                        'name'  =>  $i['name']
+                    ];
+                }
+            }
+
             $resource = [
                 'name'                         =>  $result['name'],
                 'stock'                        =>  $result['stock'],
+                'additionalOptions'            =>  $result['additionalOptions'],
+                'type'                         =>  $result['type'],
+                'options'                      =>  $additionalOptions,
                 'ticket_entities_id'           =>  $result['ticket_entities_id']
             ];
         }        
@@ -98,7 +119,7 @@ class Resource extends CommonDropdown {
     }
    
 
-    public static function create($idResource, $idReservation) {
+    public static function create($idResource, $idReservation, $additionalOptions = []) {
         $reservationData = Sql::getValuesByID($idReservation, 'glpi_reservations')->current();
         $resourceData = Sql::getValuesByID($idResource, 'glpi_plugin_fillglpi_resources_reservationsitems')->current();
 
@@ -110,10 +131,19 @@ class Resource extends CommonDropdown {
                 Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
                     'plugin_fillglpi_resources_reservationsitems_id'        =>  $idResource,
                     'plugin_fillglpi_reservations_id'                       =>  $idReservation
-                ]);               
+                ]);  
+                
+                foreach($additionalOptions as $additional) {
+                    Sql::insert('glpi_plugin_fillglpi_reservations_additionaloptions', [
+                        'plugin_fillglpi_reservations_id'                 =>  $idReservation,
+                        'plugin_fillglpi_resource_additionaloptions_id'   =>  $additional
+                    ]);
+                }
+                               
 
                 $resourceTarget = Sql::getValuesByID($resourceData['plugin_fillglpi_resources_id'], 'glpi_plugin_fillglpi_resources')->current();
 
+                //abre chamado
                 if ($resourceTarget['ticket_entities_id']) {
                     $ticket = [
                         'entities_id'       =>  $resourceTarget['ticket_entities_id'],
@@ -165,11 +195,12 @@ class Resource extends CommonDropdown {
         $data = [];
 
         foreach (Sql::getResourcesByItemType($idItemType) as $i) {      
-
             $data[] = [
-                'id'            =>  $i['id'],
-                'name'          =>  $i['name'],
-                'availability'  =>  Sql::getAvailabilityResource($i['resID'], $dateStart, $dateEnd)
+                'id'                =>  $i['id'],
+                'name'              =>  $i['name'],
+                'additionalOptions' =>  $i['additionalOptions'],
+                'type'              =>  $i['type'],
+                'availability'      =>  Sql::getAvailabilityResource($i['resID'], $dateStart, $dateEnd)
             ];
         }        
 

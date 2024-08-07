@@ -84,6 +84,8 @@ function plugin_fillglpi_install() {
                     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `name` VARCHAR(55) NOT NULL,
                     `stock` INT(10),
+                    `additionalOptions` BOOLEAN DEFAULT FALSE,
+                    `type`  VARCHAR(10) DEFAULT NULL,
                     `ticket_entities_id` INT(11) UNSIGNED,
                     PRIMARY KEY (`id`),
                     KEY `ticket_entities_id` (`ticket_entities_id`)
@@ -119,6 +121,21 @@ function plugin_fillglpi_install() {
                         ON DELETE CASCADE
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
         $DB->doQueryOrDie($query, $DB->error());
+    }    
+
+    if (!$DB->tableExists('glpi_plugin_fillglpi_resource_additionaloptions')) {
+        $query = "CREATE TABLE `glpi_plugin_fillglpi_resource_additionaloptions` (
+                    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                    `name`  VARCHAR(50) NOT NULL,                    
+                    `plugin_fillglpi_resources_id` INT(11) UNSIGNED NOT NULL,
+                    PRIMARY KEY (`id`),
+                    KEY `plugin_fillglpi_resources_id` (`plugin_fillglpi_resources_id`),
+                    CONSTRAINT `fk_glpi_plugin_fillglpi_resource_additionaloptions`
+                        FOREIGN KEY (`plugin_fillglpi_resources_id`)
+                        REFERENCES `glpi_plugin_fillglpi_resources` (`id`)
+                        ON DELETE CASCADE
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
+        $DB->doQueryOrDie($query, $DB->error());
     }
 
     // Create glpi_plugin_fillglpi_reservations_resources table
@@ -135,6 +152,20 @@ function plugin_fillglpi_install() {
                         REFERENCES `glpi_plugin_fillglpi_resources_reservationsitems` (`id`)
                         ON DELETE CASCADE
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
+        $DB->doQueryOrDie($query, $DB->error());
+    }
+
+    if (!$DB->tableExists('glpi_plugin_fillglpi_reservations_additionaloptions')) {
+        $query = "CREATE TABLE `glpi_plugin_fillglpi_reservations_additionaloptions` (
+                    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                    `plugin_fillglpi_reservations_id` INT(11) UNSIGNED NOT NULL,
+                    `plugin_fillglpi_resource_additionaloptions_id` INT(11) UNSIGNED,
+                    PRIMARY KEY (`id`),
+                    KEY `plugin_fillglpi_resource_additionaloptions_id` (`plugin_fillglpi_resource_additionaloptions_id`),
+                    CONSTRAINT `fk_plugin_fillglpi_resource_additionaloptions`
+                        FOREIGN KEY (`plugin_fillglpi_resource_additionaloptions_id`)
+                        REFERENCES `glpi_plugin_fillglpi_resource_additionaloptions` (`id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC";
         $DB->doQueryOrDie($query, $DB->error());
     }
 
@@ -161,15 +192,17 @@ function plugin_fillglpi_uninstall() {
     rename($fileRenamedOldPath, $filePath);   
 
     $tables = [
-      'limpezas',
-      'batteries',
-      'nobreaks',
-      'batterymodels',
-      'nobreakmodels',
-      'reservations_resources',
-      'resources_reservationsitems',
-      'resources',
-      'reservations'
+        'limpezas',
+        'batteries',
+        'nobreaks',
+        'batterymodels',
+        'nobreakmodels',
+        'reservations_additionaloptions',
+        'reservations_resources',
+        'resources_reservationsitems',      
+        'reservations',
+        'resource_additionaloptions',
+        'resources',
     ];
 
     foreach ($tables as $table) {
@@ -196,16 +229,23 @@ function fillglpi_additem_called(CommonDBTM $item) {
     if ($item::getType() == \Reservation::class) { 
         $obj = new GlpiPlugin\Fillglpi\Reservation;
 
-        if (isset($_POST['type_reserve']) && $_POST['type_reserve'] == 'unique') {
+        if (isset($_POST['type_reserve']) && $_POST['type_reserve'] == 'unique') {            
             Html::redirect($obj->getFormURLWithID($item->getID()));
         } else {            
             $_POST['reservations_id'] = $item->fields['id'];
+            $addOptions = [];
 
             foreach ($_POST as $i => $key) {
-                if (strpos($i, 'resource_id_') !== false) {                    
-                    GlpiPlugin\Fillglpi\Resource::create($key, $_POST['reservations_id']);
+                if (strpos($i, 'resource_id_') !== false) {  
+                    $resourceID = substr($i, strlen('resource_id_'));
+
+                    if (!is_array($key)) {
+                        array_push($addOptions, $key);
+                    }
+
+                    GlpiPlugin\Fillglpi\Resource::create($resourceID, $_POST['reservations_id'], $addOptions);
                 }
-            }  
+            }
     
             $obj->check(-1, CREATE, $_POST);
             $obj->add($_POST);

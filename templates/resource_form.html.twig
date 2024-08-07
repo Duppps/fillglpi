@@ -30,9 +30,36 @@
                     {{ macros.selectEntities('ticket_entities_id', current_value.ticket_entities_id) }}
                 </div>
             </div>
+            <div class="col">
+                <input type="checkbox" id="additionalOptions" name="additionalOptions" />
+                <label for="additionalOptions">Adicionar Opções</label>
+                <div id="box_additionalinfo" class="mt-2" style="display: none">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" value="checkbox" id="multiOptionsSelect">
+                        <label class="form-check-label" for="multiOptionsSelect">
+                            Seleção Múltipla
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" value="radio" id="uniqueOptionSelect">
+                        <label class="form-check-label" for="uniqueOptionSelect">
+                            Seleção Única
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" value="quantity" id="quantityOptionSelect">
+                        <label class="form-check-label" for="quantityOptionSelect">
+                            Seleção de Quantidade
+                        </label>
+                    </div>
+                    <div id="multiSelect">
+                        {{ macros.multiSelectByTextInput("options", "Opções", current_value.options) }}     
+                    </div>             
+                </div>
+            </div>
         </div>             
     </div>
-
+    
     <div class="mt-2">
         {% if id <= 0 %}
             <button class="btn btn-primary me-2" type="submit" name="add">
@@ -54,7 +81,7 @@
         {% endif %}
     </div>
 
-    <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}" />
+    <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}" />   
 
 </form>
 
@@ -64,13 +91,55 @@
             if ({{current_value.stock|json_encode|raw}}) {
                 $("#include_quantity").prop("checked", true);
                 $("#box_quantity").show();
+                $("#multiSelect").find('input').attr("disabled", true);
+                $("#multiSelect").hide();
             }            
 
             if ({{current_value.ticket_entities_id|json_encode|raw}}) {
                 $("#open_ticket").prop("checked", true);
                 $("#box_entities").show();
             }
+
+            if ({{current_value.additionalOptions|json_encode|raw}} == 1) {
+                $("#additionalOptions").prop("checked", true);
+                $("#box_additionalinfo").show();
+
+                const checksOptionsType = document.getElementsByName("type");
+
+                checksOptionsType.forEach((i) => {
+                    if (i.value === "{{current_value.type|raw}}") {
+                        i.checked = true;
+                    }
+                })
+            }            
         }        
+    })
+
+    $("input[name='type']").on("change", function() {
+        if ($(this).val() === "quantity") {
+            $("#multiSelect").find('input').attr("disabled", true);
+            $("#multiSelect").hide();
+        } else {
+            $("#multiSelect").find('input').attr("disabled", false);
+            $("#multiSelect").show();
+        }
+    });
+
+    $("#btn_add_option").on("click", () => {
+        const optionText = $("#options");
+        const inputOptions = $("#input_options_add");
+
+        inputOptions.val(inputOptions.val()+optionText.val()+";");
+
+        optionText.val("");
+    })
+
+    $("#additionalOptions").on("change",() => {
+        if ($("#additionalOptions").is(":checked")) {
+            $("#box_additionalinfo").show();
+        } else {
+            $("#box_additionalinfo").hide();
+        }
     })
 
     $("#include_quantity").on("change",() => {

@@ -108,6 +108,13 @@ class Form extends CommonDBTM {
                     if ((strpos($row['Field'], '_id') !== false)) {                   
                         $fieldItemType = getItemtypeForForeignKeyField($row['Field']);
 
+                        if ($row['Field'] == 'plugin_fillglpi_nobreakmodels_id') {
+                            $fieldItemType = GlpiPlugin\Fillglpi\NobreakModel::class;
+                        }
+
+                        var_dump($row['Field']);
+                        var_dump($fieldItemType);
+
                         $fields[] = [
                             'type' => 'dropdown',
                             'name' => $row['Field'],

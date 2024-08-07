@@ -391,3 +391,59 @@
     </script>
 
 {% endmacro %}
+
+{% macro multiSelectByTextInput(name, label, values) %}
+    <label for="value_to_add" class="form-label">{{label}}</label>
+    <div class="input-group">
+        <input type="text" id="value_to_add" class="form-control">
+        <button type="button" id="btn_add_value" class="btn btn-primary">Adicionar</button>
+    </div>
+
+    <div class="mt-3 border d-flex flex-wrap rounded p-1" id="optionsView" style="min-height: 40px"></div>
+    <input type="text" id="{{name}}" name="{{name}}" readonly style="display:none;">
+
+    <script type="text/javascript">   
+        const inputOptions = $("#{{name|raw}}");     
+
+        $(document).ready(() => {
+            var valuesCurrent = ({{values|json_encode|raw}});
+            if (valuesCurrent) {
+                valuesCurrent.forEach((i) => {     
+                    inputOptions.val(inputOptions.val() + i.name + ";");
+
+                    $('#optionsView').append('<span data-value="' + i.name + '" class="selected-item border rounded-pill px-2 py-1 m-2" style="cursor: pointer"><span class="selected-item-remove">' + i.name + '  <i class="fas fa-xmark"></i></span></span>');
+                })
+            }
+        })
+
+        $("#btn_add_value").on("click", () => {
+            const optionAdd = $("#value_to_add");
+
+            if (optionAdd.val() === "") {
+                return;
+            }            
+
+            inputOptions.val(inputOptions.val() + optionAdd.val() + ";");
+
+            $('#optionsView').append('<span data-value="'+optionAdd.val()+'" class="selected-item border rounded-pill px-2 py-1 m-2" style="cursor: pointer"><span class="selected-item-remove">' + optionAdd.val() + '  <i class="fas fa-xmark"></i></span></span>');
+            optionAdd.val("");
+        });    
+
+        $(document).on('click', '.selected-item-remove', function() {
+            var valueToRemove = $(this).parent().attr('data-value');
+            var valueInput = $('#options');
+
+            var valuesSelected = valueInput.val().split(";");
+
+            var index = valuesSelected.indexOf(valueToRemove);
+
+            if (index !== -1) {
+                valuesSelected.splice(index, 1);
+            }
+
+            valueInput.val(valuesSelected.join(";"));
+            
+            $(this).parent().remove();    
+        });    
+    </script>
+{% endmacro %}

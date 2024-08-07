@@ -211,6 +211,7 @@ class Sql
         global $DB;
         $response = [];
         $resources = [];
+        $additionalOptions = [];
 
         $query = "
             SELECT 
@@ -238,7 +239,19 @@ class Sql
                 gr.id = " . $ID . "
         ";
 
+        $queryAdditionalOptions = "
+            SELECT resource_addopt.name, resource_addopt.id, resource_addopt.plugin_fillglpi_resources_id as resource_id
+                FROM
+                    glpi_plugin_fillglpi_resource_additionaloptions resource_addopt                    
+                INNER JOIN
+                    glpi_plugin_fillglpi_reservations_additionaloptions reservation_addopt
+                       ON reservation_addopt.plugin_fillglpi_resource_additionaloptions_id = resource_addopt.id
+                WHERE
+                    reservation_addopt.plugin_fillglpi_reservations_id = " . $ID . "
+        ";
+
         $result = $DB->request($query);
+        $additionalOptionsResult = $DB->request($queryAdditionalOptions);
 
         foreach ($result as $r) {
             $itemTable = getTableForItemType($r['itemtype']);
@@ -246,10 +259,23 @@ class Sql
             $itemName = $itemDetails->current()['name'];
 
             foreach (self::getValuesByID($r['resourceItemID'], 'glpi_plugin_fillglpi_resources') as $c) {
-                array_push($resources, $c['name']);
-            }     
+                foreach ($additionalOptionsResult as $meudeus) {
+                    if ($c['id'] === $meudeus['resource_id']) {
+                        array_push($additionalOptions, [
+                            "id"    =>  $meudeus["id"],
+                            "name"  =>  $meudeus["name"]
+                        ]);
+                    }
+                }
 
-            $response[] = [
+                array_push($resources, [
+                    'id'                =>  $c['id'],
+                    'name'              =>  $c['name'],
+                    'additionalOptions' =>  $additionalOptions
+                ]);
+            }
+
+            $response = [
                 'user'              =>  $r['user_name'],
                 'itemName'          =>  $itemName,
                 'begin'             =>  DateFormatter::formatToBr($r['begin']),
@@ -283,7 +309,7 @@ class Sql
         $a = [];
 
         $items = $DB->request(
-            'SELECT reservation_resources.*, glpi_plugin_fillglpi_resources.name, glpi_plugin_fillglpi_resources.id as resID FROM glpi_plugin_fillglpi_resources
+            'SELECT reservation_resources.*, glpi_plugin_fillglpi_resources.name, glpi_plugin_fillglpi_resources.type, glpi_plugin_fillglpi_resources.additionalOptions, glpi_plugin_fillglpi_resources.id as resID FROM glpi_plugin_fillglpi_resources
                 INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems reservation_resources
                     ON reservation_resources.plugin_fillglpi_resources_id = glpi_plugin_fillglpi_resources.id
                 INNER JOIN glpi_reservationitems reservationitems
@@ -292,17 +318,31 @@ class Sql
         );
 
         foreach ($items as $r) {
+            $additionalOptions = [];
+            if ($r['additionalOptions'] === 1) {
+                $options = self::getValuesByID($r['resID'], 'glpi_plugin_fillglpi_resource_additionaloptions', 'plugin_fillglpi_resources_id');
+                foreach ($options as $opt) {
+                    $additionalOptions[] = [
+                        'id'    => $opt['id'],
+                        'name'  => $opt['name']
+                    ];
+                }
+            }
+
             $a[] = [
-                'id'    => $r['id'],
-                'name'  => $r['name'],
-                'resID' => $r['resID']
+                'id'                => $r['id'],
+                'name'              => $r['name'],
+                'resID'             => $r['resID'],
+                'type'              => $r['type'],
+                'additionalOptions' => $additionalOptions
             ];
         }
 
         return $a;
     }
 
-    public static function getAvailabilityResource($id, $dateStart, $dateEnd) {
+    public static function getAvailabilityResource($id, $dateStart, $dateEnd)
+    {
         global $DB;
 
         $items = $DB->request(
@@ -328,7 +368,8 @@ class Sql
         return true;
     }
 
-    public static function getReservationsResources($resource) {
+    public static function getReservationsResources($resource)
+    {
         global $DB;
         $response = [];
 
@@ -340,8 +381,8 @@ class Sql
                     ON gresres.id = grr.plugin_fillglpi_resources_reservationsitems_id
                 INNER JOIN glpi_plugin_fillglpi_resources gresources
                     ON gresources.id = gresres.plugin_fillglpi_resources_id
-                WHERE gresres.id = '.intval($resource)
-            );
+                WHERE gresres.id = ' . intval($resource)
+        );
 
         foreach ($i as $a) {
             $response[] = [
@@ -352,5 +393,12 @@ class Sql
         }
 
         return $response;
+    }
+
+    public static function purgeData($table, $valueToSearch, $fieldToSearch)
+    {
+        global $DB;
+
+        $DB->delete($table, [$fieldToSearch => $valueToSearch]);
     }
 }

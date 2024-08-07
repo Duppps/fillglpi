@@ -1,71 +1,39 @@
 {% import "components/form/fields_macros.html.twig" as fields %}
 
-<tr id="tr_quantity">
-    <td>Quantidade de Pessoas</td>
-    <td>
-        {{ fields.dropdownNumberField(
-            'people_quantity',
-            '1',
-            ''
-        ) }}
-    </td>
-</tr>
-
-<div class="modal fade" id="modalCalendar" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title">Modal title</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="calendar"></div>
-      </div>      
-    </div>
-  </div>
-</div>
-
 <script type="text/javascript">
     $(document).ready(function() {
 
-    function hasItemLikeParam(values) {
-        let params = new URLSearchParams(window.location.search);
-        for (let key of params.keys()) {
-            if (key.startsWith('item')) {
-                values.push(params.get(key));
+        function hasItemLikeParam(values) {
+            let params = new URLSearchParams(window.location.search);
+            for (let key of params.keys()) {
+                if (key.startsWith('item')) {
+                    values.push(params.get(key));
+                }
+            }
+            return values.length > 0;
+        }
+
+        function initializeResources() {
+            $(".row_resources").remove(); 
+            let items = [];
+
+            if (hasItemLikeParam(items)) {
+                items.forEach(item => {                
+                    getResources(item, $("input[name^='resa[begin]']").val(), $("select[name^='resa[_duration]']").find(":selected").val());
+                });
+            } else {
+                $("#tr_quantity").hide().append(`<input type='text' name="type_reserve" value='unique' style='display: none' />`);
             }
         }
-        return values.length > 0;
-    }
 
-    function initializeResources() {
-        $(".row_resources").remove(); 
-        let items = [];
-
-        if (hasItemLikeParam(items)) {
-            items.forEach(item => {                
-                getResources(item, $("input[name^='resa[begin]']").val(), $("select[name^='resa[_duration]']").find(":selected").val());
-            });
-        } else {
-            $("#tr_quantity").hide().append(`<input type='text' name="type_reserve" value='unique' style='display: none' />`);
-        }
-    }
-
-    //$("input[name^='resa[begin]']").on('change', function() {
-    //    initializeResources();
-    //});
-
-    //$("select[name^='resa[_duration]']").on('change', function() { 
-    //    initializeResources();
-    //});
-
-    let timeout;
-    const debounce = function(func, wait) {
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
+        let timeout;
+        
+        const debounce = function(func, wait) {
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
         };
-    };
 
     const handleInputChange = debounce(initializeResources, 300);
 
@@ -76,44 +44,65 @@
         const dateEnd = calculateEndDate(dateBegin, secondsEnd);
 
         $.get("{{ path('/plugins/fillglpi/ajax/resources.php') }}", {item: item, dateBegin: dateBegin, dateEnd: dateEnd}, function(response) {
+            console.log(response);
             if (response.resources.length > 0) {
-                let title = $('<td>').text('Recursos para ' + response.Item);
-                let resources = $('<td>');
                 let tr = $('<tr>');
-                let resourcesTable = $('<table>');
+                let resources = $('<td colspan="2">');
+                let resourcesTable = $('<table>').addClass("w-100");
+                let moreOptionsContainer = $('<div>').addClass("my-2");
 
-                response.resources.forEach(resource => {
-                    let disabled = "";
-                    let title_reserved = "";
-                    let icon_reserved = "";
+                response.resources.forEach((resource) => {
+                    let form = "";        
+                    let title_reserved = resource.availability === false ? "title='Recurso já reservado nesse horário'" : "";
+                    let disabled = resource.availability === false ? "disabled" : "";
+                    let icon_reserved = resource.availability === false ? '<i class="fa-regular fa-clock"></i>' : "";
 
-                    if (resource.availability === false) {
-                        disabled = "disabled";
-                        title_reserved = "title='Recurso já reservado nesse horário'";
-                        icon_reserved = '<i class="fa-regular fa-clock"></i>';
-                        //calendar = `<a href="#" onclick="getRecoursesAvailability(${resource.id})" data-bs-toggle="modal" data-bs-target="#modalCalendar"><i class="fa-regular fa-calendar"></i></a>`; #}
+                    if (!resource.type) {
+                        form = `
+                            <tr ${title_reserved}>
+                                <td style="width: 1%">
+                                    <input class="form-check-input" type="checkbox" id="${resource.id}_${resource.for}" name="resource_id_${resource.id}_${resource.for}" value="${resource.id}" ${disabled} />
+                                </td>
+                                <td>
+                                    <label class="form-check-label d-inline" for="${resource.id}_${resource.for}">${resource.name}</label>
+                                    ${icon_reserved}
+                                </td>
+                            </tr>
+                        `;
+                        resourcesTable.append(form);  
+                    } else {
+                        let moreOptionsTable = $('<table>').addClass("w-100");
+                        let moreOptionsDiv = $('<div>').addClass("my-2");
+                        moreOptionsDiv.append(`<h4>${resource.name}</h4>`);
+
+                        resource.additionalOptions.forEach((opt) => {
+                            moreOptionsTable.append(`                            
+                                <tr>
+                                    <td style="width: 1%">
+                                        <input class="form-check-input" type="${resource.type}" id="${resource.id+"_"+opt.id}" name="resource_id_${resource.id}" value="${opt.id}" />
+                                    </td>
+                                    <td>
+                                        <label class="form-check-label d-inline" for="${resource.id+"_"+opt.id}">${opt.name}</label>
+                                    </td>
+                                </tr>
+                            `);                                                
+                        });
+
+                        if (resource.type === "quantity") {
+                            moreOptionsTable.append(`<input type="number" name="people_quantity">`);
+                        }
+
+                        moreOptionsDiv.append(moreOptionsTable);
+                        moreOptionsContainer.append(moreOptionsDiv);
                     }
-
-                    let form = `
-                        <tr ${title_reserved}>
-                            <td style="width: 1%">
-                                <input class="form-check-input" type="checkbox" id="${resource.id}_${resource.for}" name="resource_id_${resource.id}_${resource.for}" value="${resource.id}" ${disabled} />
-                            </td>
-                            <td>
-                                <label class="form-check-label d-inline" for="${resource.id}_${resource.for}">${resource.name}</label>
-                                ${icon_reserved}
-                            </td>
-                        </tr>
-                    `;
-
-                    resourcesTable.append(form);
                 });
 
                 resources.append(resourcesTable);
-                tr.append(title);
+                resources.append(moreOptionsContainer);
+
+                tr.append($('<td>').text('Recursos para '+response.Item));
                 tr.append(resources);
 
-                resourcesTable.addClass("w-100");
                 tr.addClass("row_resources");
 
                 let submitButton = $(".tab_cadre").find('tr').eq(-1);

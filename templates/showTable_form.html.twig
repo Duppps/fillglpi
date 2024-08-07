@@ -67,7 +67,7 @@
                 byList: $("#porLista").val(),                
             },
             function(response) {
-                table = $("#reservations_table_body");
+                let table = $("#reservations_table_body");
                 table.empty();
 
                 response.forEach((c) => {
@@ -94,78 +94,58 @@
         );
     });
 
-    function showFormModal(e) {        
+    function showFormModal(e) {  
         $.get(
             "{{ path('/plugins/fillglpi/ajax/reservations.php') }}",
             {
                 id: e.value,                
             },
             function(response) {
+                console.log(response);
                 let table = $('<table>').addClass('w-100');
-                
-                response.forEach((i) => {                    
-                    table.html(`
-                        <tr>
-                            <td>
-                                Usuário
-                            </td>
-                            <td>
-                                ${i.user}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Item
-                            </td>
-                            <td>
-                                ${i.itemName}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Início
-                            </td>
-                            <td>
-                                ${i.begin}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Fim
-                            </td>
-                            <td>
-                                ${i.end}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Quantidade de Pessoas
-                            </td>
-                            <td>
-                                ${i.peopleQuantity}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Comentário
-                            </td>
-                            <td>
-                                ${i.comment}
-                            </td>
-                        </tr> 
-                        <tr>
-                            <td>
-                                Recursos
-                            </td>
-                            <td>
-                                ${i.recursos}
-                            </td>
-                        </tr>                       
-                    `);
-                });
 
-                $("#modalBody").empty();
-                $("#modalBody").append(table);
+                let rows = `
+                    <tr>
+                        <td>Usuário</td>
+                        <td>${response.user}</td>
+                    </tr>
+                    <tr>
+                        <td>Item</td>
+                        <td>${response.itemName}</td>
+                    </tr>
+                    <tr>
+                        <td>Início</td>
+                        <td>${response.begin}</td>
+                    </tr>
+                    <tr>
+                        <td>Fim</td>
+                        <td>${response.end}</td>
+                    </tr>
+                    <tr>
+                        <td>Quantidade de Pessoas</td>
+                        <td>${response.peopleQuantity}</td>
+                    </tr>
+                    <tr>
+                        <td>Comentário</td>
+                        <td>${response.comment}</td>
+                    </tr>`;
+
+                if (response.recursos && response.recursos.length > 0) {                    
+                    response.recursos.forEach((recurso) => {
+                        rows += `
+                            <tr>
+                                <td>${recurso.name}</td>
+                                <td>
+                                    <ul>
+                                        ${recurso.additionalOptions.map(option => `<li>${option.name}</li>`).join('')}
+                                    </ul>
+                                </td>
+                            </tr>`;
+                    });
+                }
+
+                table.html(rows);
+                $("#modalBody").empty().append(table);
             }
         );
     }
