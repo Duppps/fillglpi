@@ -101,7 +101,6 @@
                 id: e.value,                
             },
             function(response) {
-                console.log(response);
                 let table = $('<table>').addClass('w-100');
 
                 let rows = `
@@ -122,26 +121,25 @@
                         <td>${response.end}</td>
                     </tr>
                     <tr>
-                        <td>Quantidade de Pessoas</td>
-                        <td>${response.peopleQuantity}</td>
-                    </tr>
-                    <tr>
                         <td>Comentário</td>
                         <td>${response.comment}</td>
                     </tr>`;
 
-                if (response.recursos && response.recursos.length > 0) {                    
+                if (response.recursos && response.recursos.length > 0) { 
+                    rows += `
+                            <tr>
+                                <td class="align-text-top">Recursos</td>
+                                <td><ul>`;
                     response.recursos.forEach((recurso) => {
                         rows += `
-                            <tr>
-                                <td>${recurso.name}</td>
-                                <td>
-                                    <ul>
-                                        ${recurso.additionalOptions.map(option => `<li>${option.name}</li>`).join('')}
-                                    </ul>
-                                </td>
-                            </tr>`;
-                    });
+                            
+                                <li>${recurso.name}</li>
+                            `;
+                    });                               
+                                    
+                    rows += `</ul>
+                            </td>
+                        </tr>`;                 
                 }
 
                 table.html(rows);

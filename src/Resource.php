@@ -35,16 +35,7 @@ class Resource extends CommonDropdown {
             'name'               => __('Stock'),
             'datatype'           => 'number',
             'massiveaction'      => true
-        ];
-
-        $tab[] = [
-            'id'                 => '4',
-            'table'              => $this::getTable(),
-            'field'              => 'additionalOptions',
-            'name'               => __('Opções Adicionais'),
-            'datatype'           => 'bool',
-            'massiveaction'      => true
-        ];        
+        ];             
 
         return $tab;
     }
@@ -85,22 +76,12 @@ class Resource extends CommonDropdown {
             ];
         }
 
-        foreach ($resourceResults as $result) {
-            if ($result['additionalOptions']) {
-                foreach (Sql::getValuesByID($result['id'], 'glpi_plugin_fillglpi_resource_additionaloptions', 'plugin_fillglpi_resources_id') as $i) {
-                    $additionalOptions[] = [
-                        'id'    =>  $i['id'],
-                        'name'  =>  $i['name']
-                    ];
-                }
-            }
+        foreach ($resourceResults as $result) {            
 
             $resource = [
                 'name'                         =>  $result['name'],
                 'stock'                        =>  $result['stock'],
-                'additionalOptions'            =>  $result['additionalOptions'],
                 'type'                         =>  $result['type'],
-                'options'                      =>  $additionalOptions,
                 'ticket_entities_id'           =>  $result['ticket_entities_id']
             ];
         }        
@@ -119,36 +100,29 @@ class Resource extends CommonDropdown {
     }
    
 
-    public static function create($idResource, $idReservation, $additionalOptions = []) {
+    public static function create($idResource, $idReservation) {
         $reservationData = Sql::getValuesByID($idReservation, 'glpi_reservations')->current();
         $resourceData = Sql::getValuesByID($idResource, 'glpi_plugin_fillglpi_resources_reservationsitems')->current();
 
         $iditem = $reservationData['reservationitems_id'];
         $iditemRes = $resourceData['reservationitems_id'];
-
+        
         if ($iditem == $iditemRes) {
             if (Sql::getAvailabilityResource($resourceData['plugin_fillglpi_resources_id'], $reservationData['begin'], $reservationData['end'])) {
                 Sql::insert('glpi_plugin_fillglpi_reservations_resources', [
                     'plugin_fillglpi_resources_reservationsitems_id'        =>  $idResource,
                     'plugin_fillglpi_reservations_id'                       =>  $idReservation
-                ]);  
-                
-                foreach($additionalOptions as $additional) {
-                    Sql::insert('glpi_plugin_fillglpi_reservations_additionaloptions', [
-                        'plugin_fillglpi_reservations_id'                 =>  $idReservation,
-                        'plugin_fillglpi_resource_additionaloptions_id'   =>  $additional
-                    ]);
-                }
-                               
+                ]);                               
 
                 $resourceTarget = Sql::getValuesByID($resourceData['plugin_fillglpi_resources_id'], 'glpi_plugin_fillglpi_resources')->current();
 
                 //abre chamado
                 if ($resourceTarget['ticket_entities_id']) {
+                    $itemName = Sql::getReservationItemName($iditemRes);
                     $ticket = [
                         'entities_id'       =>  $resourceTarget['ticket_entities_id'],
                         'name'              =>  'Reserva para '.$resourceTarget['name'],
-                        'content'           =>  'Reserva para o '.$resourceTarget['name'].' na data '.$reservationData['begin'],
+                        'content'           =>  'Reserva para o '.$resourceTarget['name'].' na data '.$reservationData['begin'].'\n'.$itemName,
                         'date'              =>  date('Y-m-d h:i:s', time()),
                         'requesttypes_id'   =>  1,
                         'status'            =>  1
@@ -198,7 +172,6 @@ class Resource extends CommonDropdown {
             $data[] = [
                 'id'                =>  $i['id'],
                 'name'              =>  $i['name'],
-                'additionalOptions' =>  $i['additionalOptions'],
                 'type'              =>  $i['type'],
                 'availability'      =>  Sql::getAvailabilityResource($i['resID'], $dateStart, $dateEnd)
             ];

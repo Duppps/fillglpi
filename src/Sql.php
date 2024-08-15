@@ -211,7 +211,6 @@ class Sql
         global $DB;
         $response = [];
         $resources = [];
-        $additionalOptions = [];
 
         $query = "
             SELECT 
@@ -223,8 +222,7 @@ class Sql
                 gri.itemtype,
                 gri.items_id,
                 gri.id AS reservationItemID,
-                gpc.people_quantity,
-                frr.plugin_fillglpi_resources_id AS resourceItemID
+                gpc.people_quantity
             FROM 
                 glpi_reservations gr
             INNER JOIN 
@@ -232,48 +230,37 @@ class Sql
             INNER JOIN 
                 glpi_users gu ON gr.users_id = gu.id
             INNER JOIN 
-                glpi_reservationitems gri ON gr.reservationitems_id = gri.id
-            INNER JOIN
-                glpi_plugin_fillglpi_resources_reservationsitems frr ON gri.id = frr.reservationitems_id
+                glpi_reservationitems gri ON gr.reservationitems_id = gri.id            
             WHERE 
                 gr.id = " . $ID . "
         ";
 
-        $queryAdditionalOptions = "
-            SELECT resource_addopt.name, resource_addopt.id, resource_addopt.plugin_fillglpi_resources_id as resource_id
-                FROM
-                    glpi_plugin_fillglpi_resource_additionaloptions resource_addopt                    
-                INNER JOIN
-                    glpi_plugin_fillglpi_reservations_additionaloptions reservation_addopt
-                       ON reservation_addopt.plugin_fillglpi_resource_additionaloptions_id = resource_addopt.id
-                WHERE
-                    reservation_addopt.plugin_fillglpi_reservations_id = " . $ID . "
-        ";
+        $qryResources = "
+                SELECT resources.name
+                    FROM
+                        glpi_plugin_fillglpi_resources resources
+                    INNER JOIN
+                        glpi_plugin_fillglpi_resources_reservationsitems resources_reservationsitems
+                            ON resources_reservationsitems.plugin_fillglpi_resources_id = resources.id
+                    INNER JOIN
+                        glpi_plugin_fillglpi_reservations_resources reservations_resources
+                            ON reservations_resources.plugin_fillglpi_resources_reservationsitems_id = resources_reservationsitems.id
+                    WHERE
+                        reservations_resources.plugin_fillglpi_reservations_id = " . $ID;
 
+        $resource = $DB->request($qryResources);
         $result = $DB->request($query);
-        $additionalOptionsResult = $DB->request($queryAdditionalOptions);
+
+        foreach ($resource as $c) {
+            array_push($resources, [
+                'name'              =>  $c['name']
+            ]);
+        }
 
         foreach ($result as $r) {
             $itemTable = getTableForItemType($r['itemtype']);
             $itemDetails = self::getValuesByID($r['items_id'], $itemTable);
             $itemName = $itemDetails->current()['name'];
-
-            foreach (self::getValuesByID($r['resourceItemID'], 'glpi_plugin_fillglpi_resources') as $c) {
-                foreach ($additionalOptionsResult as $meudeus) {
-                    if ($c['id'] === $meudeus['resource_id']) {
-                        array_push($additionalOptions, [
-                            "id"    =>  $meudeus["id"],
-                            "name"  =>  $meudeus["name"]
-                        ]);
-                    }
-                }
-
-                array_push($resources, [
-                    'id'                =>  $c['id'],
-                    'name'              =>  $c['name'],
-                    'additionalOptions' =>  $additionalOptions
-                ]);
-            }
 
             $response = [
                 'user'              =>  $r['user_name'],
@@ -285,7 +272,6 @@ class Sql
                 'recursos'          =>  $resources
             ];
         }
-
         return $response;
     }
 
@@ -309,7 +295,7 @@ class Sql
         $a = [];
 
         $items = $DB->request(
-            'SELECT reservation_resources.*, glpi_plugin_fillglpi_resources.name, glpi_plugin_fillglpi_resources.type, glpi_plugin_fillglpi_resources.additionalOptions, glpi_plugin_fillglpi_resources.id as resID FROM glpi_plugin_fillglpi_resources
+            'SELECT reservation_resources.*, glpi_plugin_fillglpi_resources.name, glpi_plugin_fillglpi_resources.type, glpi_plugin_fillglpi_resources.id as resID FROM glpi_plugin_fillglpi_resources
                 INNER JOIN glpi_plugin_fillglpi_resources_reservationsitems reservation_resources
                     ON reservation_resources.plugin_fillglpi_resources_id = glpi_plugin_fillglpi_resources.id
                 INNER JOIN glpi_reservationitems reservationitems
@@ -318,23 +304,11 @@ class Sql
         );
 
         foreach ($items as $r) {
-            $additionalOptions = [];
-            if ($r['additionalOptions'] === 1) {
-                $options = self::getValuesByID($r['resID'], 'glpi_plugin_fillglpi_resource_additionaloptions', 'plugin_fillglpi_resources_id');
-                foreach ($options as $opt) {
-                    $additionalOptions[] = [
-                        'id'    => $opt['id'],
-                        'name'  => $opt['name']
-                    ];
-                }
-            }
-
             $a[] = [
                 'id'                => $r['id'],
                 'name'              => $r['name'],
                 'resID'             => $r['resID'],
                 'type'              => $r['type'],
-                'additionalOptions' => $additionalOptions
             ];
         }
 
@@ -361,7 +335,7 @@ class Sql
 
         $stock = self::getSpecificField('stock', 'glpi_plugin_fillglpi_resources', $id, 'id');
 
-        if ($items->current()['count'] >= $stock && $stock !== NULL) {
+        if ($items->current()['count'] > $stock && $stock !== NULL) {
             return false;
         }
 
@@ -400,5 +374,20 @@ class Sql
         global $DB;
 
         $DB->delete($table, [$fieldToSearch => $valueToSearch]);
+    }
+
+    public static function getReservationItemName($reservationItemId) {
+        global $DB;
+
+        $qryItemType = $DB->request('SELECT itemtype, items_id FROM glpi_reservationitems WHERE id = '.$reservationItemId);
+        
+        $itemTable = getTableForItemType($qryItemType->current()['itemtype']);
+        $itemId = $qryItemType->current()['items_id'];
+
+
+        return $DB->request('
+            SELECT name FROM '.$itemTable.' WHERE id = '.$itemId
+        )->current()['name'];
+
     }
 }

@@ -76,7 +76,8 @@
                         moreOptionsDiv.append(`<h4>${resource.name}</h4>`);
 
                         resource.additionalOptions.forEach((opt) => {
-                            moreOptionsTable.append(`                            
+                            if (resource.type != "quantity") {
+                                moreOptionsTable.append(`                            
                                 <tr>
                                     <td style="width: 1%">
                                         <input class="form-check-input" type="${resource.type}" id="${resource.id+"_"+opt.id}" name="resource_id_${resource.id}" value="${opt.id}" />
@@ -85,7 +86,8 @@
                                         <label class="form-check-label d-inline" for="${resource.id+"_"+opt.id}">${opt.name}</label>
                                     </td>
                                 </tr>
-                            `);                                                
+                            `);  
+                            }                                                                          
                         });
 
                         if (resource.type === "quantity") {

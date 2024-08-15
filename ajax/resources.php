@@ -31,8 +31,7 @@ if (isset($_GET['item']) && isset($_GET['dateBegin']) && isset($_GET['dateEnd'])
             'name'                  =>  $data['name'],
             'for'                   =>  $idItem,
             'type'                  =>  $data['type'],
-            'additionalOptions'     =>  $data['additionalOptions'],
-            'availability'          =>  $data['availability']
+            'availability'          =>  $data['availability'],
         ];
     }
 

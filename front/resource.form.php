@@ -15,26 +15,15 @@ if (!$plugin->isInstalled('fillglpi') || !$plugin->isActivated('fillglpi')) {
 
 Session::checkLoginUser();
 
-if (isset($_POST['add'])) {
-
-   if (!isset($_POST['additionalOptions'])) {
-      unset($_POST['type']);
-      unset($_POST['options']);
-   } else {
-      $_POST['additionalOptions'] = 1;
-   }
-
+if (isset($_POST['add'])) {   
    if (!isset($_POST['open_ticket'])) {
       unset($_POST['ticket_entities_id']);
    }
 
    if (!isset($_POST['include_quantity'])) {
       unset($_POST['stock']);
-   }
+   }   
    
-   $options = explode(";", $_POST['options']);
-   array_pop($options);
-
    $obj->check(-1, CREATE, $_POST);
    $obj->add($_POST);
 
@@ -43,10 +32,6 @@ if (isset($_POST['add'])) {
          Sql::insert('glpi_plugin_fillglpi_resources_reservationsitems', ['plugin_fillglpi_resources_id' => $obj->getID(), 'reservationitems_id' => $value]);
       }
    }  
-   
-   foreach ($options as $opt) {
-      Sql::insert('glpi_plugin_fillglpi_resource_additionaloptions', ['name' => $opt, 'plugin_fillglpi_resources_id' => $obj->getID()]);
-   }
 
    Html::redirect($obj->getLinkURL());
 } else if (isset($_POST["update"])) {

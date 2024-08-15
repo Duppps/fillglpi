@@ -7,6 +7,7 @@ use CommonDBTM;
 use CommonGLPI;
 use Session;
 use Glpi\Application\View\TemplateRenderer;
+use Html;
 
 class Reservation extends CommonDBTM
 {
@@ -134,7 +135,6 @@ class Reservation extends CommonDBTM
 
         //Pega os itens da reserva
         $resourceReservation = Sql::getValuesByID($reservation['reservationitems_id'], 'glpi_reservationitems');
-
         
         foreach ($resourceReservation as $resource) {
             $itemID = $resource['items_id'];
@@ -143,7 +143,13 @@ class Reservation extends CommonDBTM
 
         $resources = Resource::getResourceByItemTypeAndCheckAvailability($reservation['reservationitems_id'], $reservation['begin'], $reservation['end']);
 
+        if (count($resources) <= 0) {
+            $res = new \Reservation();
+            Html::redirect($res->getFormURLWithID($reservation['id']));
+        }
+
         $table = getTableForItemType($itemType);
+
         foreach (Sql::getValuesByID($itemID, $table) as $i) {
             $resourceName = $i['name'];
         }        
